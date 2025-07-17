@@ -1,3 +1,5 @@
+//SERVICE RELATIF AUX USERS
+
 //Dépendances nécessaires au service
 
 const sql = require('mssql');
@@ -8,54 +10,55 @@ const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
 
 
-//Connexion à l'active directory
-
-
-
-
 
 const userService = {
     
-    login : async (username, password) => { //A VERIFIER !!!!!! EST CE QUE activedirectory a besoin d'un async/await
-
-        console.log('SALUT!!!!!')
+    login: async (username, password) => {
         
+        console.log('SALUT!!!!!');
+        
+        //Connexion à l'active directory
+        const ad = new ActiveDirectory(adConfig);
+
         try {
 
-            const ad = new ActiveDirectory(adConfig)
+            //Demande d'authentification de l'utilisateur au LDAP au travers d'une promesse
+            const auth = await new Promise((resolve, reject) => {
 
-            console.log('COUCOU');
+            ad.authenticate(username, password, function(err, auth) {
 
-
-
-            await ad.authenticate(username, password, function(err, auth){
-
+                //Si erreur rejette la demande
                 if (err) {
-                    console.log(`ERROR : ${err}`);
-                    console.log("Je passe dans le if err du service");
-                    
-                    return
+                console.log(`ERROR : ${err}`);
+                return reject(err);
                 }
 
+                //Si authentification ok, résous la promesse en retournant true pour continuer la procédure
                 if (auth) {
-                    console.log(`${username} authentifié ! `);
-                    console.log("Je passe dans le if auth du service");
-                    return true
-                }
-                else{
-                    console.log("Échec de l'authentification");
+                console.log(`${username} authentifié !`);
+                return resolve(true);
+
+                //Si authentification n'est pas ok => échec de l'auth et stop de la procédure
+                } else {
+                console.log("Échec de l'authentification");
+                return resolve(false);
                 }
 
-            }) 
-    
+            });
 
-            
+            });
+
+            return auth;
+
         } catch (error) {
-            console.log(error + 'ERREUR');
-            
+
+            console.log(error + ' ERREUR');
+
+            return false;
         }
         
-    }
+        }
+
 
 }
 

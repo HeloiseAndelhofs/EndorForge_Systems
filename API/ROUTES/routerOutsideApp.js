@@ -18,10 +18,15 @@ router.post('/login', async (req, res) => {
     try {
         
         const successLogin = await userService.login(username, password)
-
+        console.log(successLogin + " Succes Login de la route/controller");
+        
         if (successLogin) {
+            console.log("Oui oui c'est réussi");
+            console.log(username);
             return res.status(200).json({message : 'Authentification réussie'})
         } else {
+            console.log("C'est raté, oh non !");
+            
             return res.status(401).json({message : 'Authentification échouée'})
         }
 

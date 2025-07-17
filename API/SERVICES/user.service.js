@@ -28,22 +28,25 @@ const userService = {
 
 
 
-            ad.authenticate(username, password, function(err, auth){
+            await ad.authenticate(username, password, function(err, auth){
 
                 if (err) {
                     console.log(`ERROR : ${err}`);
+                    console.log("Je passe dans le if err du service");
+                    
                     return
                 }
 
                 if (auth) {
                     console.log(`${username} authentifié ! `);
-                    return
+                    console.log("Je passe dans le if auth du service");
+                    return true
                 }
                 else{
                     console.log("Échec de l'authentification");
                 }
 
-            }) // !!!! Ce sera ça qu'il faudra utiliser quand l'ad sera configurer
+            }) 
     
 
             

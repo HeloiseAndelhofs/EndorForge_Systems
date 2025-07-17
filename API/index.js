@@ -1,14 +1,25 @@
 //Variables running server
 
 const express = require('express')
+const router = require('./ROUTES/router')
+const http = require('http')
+const cors = require('cors')
+
 const app = express()
-const port = 3000
+const { PORT } = process.env
 
-app.get('/', (req, res) => {
-    res.send("hello world")
-})
+const server = http.createServer(app)
 
-app.listen(port, () => {
-    console.log(`Connection faite sur le port ${port}`);
+
+
+
+app.use(express.json())
+app.use('/api', router)
+
+
+
+
+app.listen(PORT, () => {
+    console.log(`Connection faite sur le port ${ PORT }`);
     
 })

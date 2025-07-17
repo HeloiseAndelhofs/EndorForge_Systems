@@ -1,0 +1,39 @@
+{ 
+    "user" :
+        [{  
+            "id" : 1,
+            "username" : "ChAznable",
+            "password" : "CharAznable9182*",
+            "name" : "Char",
+            "firstname" : "Aznable",
+            "team" : "Direction",
+            "role" : "RABADON"
+        },
+        {
+            "id" : 2,
+            "username" : "AmRay",
+            "password" : "AmuroRay9182*",
+            "name" : "Amuro",
+            "firstname" : "Ray",
+            "team" : "IT",
+            "role" : "TRINITE"
+        },
+        {
+            "id" : 3,
+            "username" : "MiYashima",
+            "password" : "MiraiYashima9182*",
+            "name" : "Mirai",
+            "firstname" : "Yashima",
+            "team" : "IT",
+            "role" : "MERCURE"
+        },
+        {
+            "id" : 4,
+            "username" : "BrNoa",
+            "password" : "BrightNoa9182*",
+            "name" : "Bright",
+            "firstname" : "Noa",
+            "team" : "Développement",
+            "role" : "RABADON"
+        }]
+}

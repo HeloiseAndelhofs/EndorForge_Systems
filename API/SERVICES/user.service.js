@@ -53,12 +53,33 @@ const userService = {
         } catch (error) {
 
             console.log(error + ' ERREUR');
-
-            return false;
+            throw new Error(err.message);
+            
         }
         
-        }
+        },
 
+        getUsers: async() => {
+
+            try {
+                    
+            console.log("Service getUsers Hello");
+            console.log(sqlConfig);
+            
+
+                await sql.connect(sqlConfig)
+                const request = new sql.Request()
+
+                const result = await request
+                    .query(`SELECT * FROM users`)
+
+                return result.recordset[0]
+
+            } catch (err) {
+                console.error(err);
+                throw new Error(err.message)
+            }
+        }
 
 }
 

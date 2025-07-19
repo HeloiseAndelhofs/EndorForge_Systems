@@ -14,21 +14,25 @@ const userController = {
         try {
             
             //Récupère le username et password du body 
-            const { username, password } = req.body
+            const { username, email, password } = req.body
 
             //Vérification que les données demandées sont présentes
-            if (!username || !password) {
-                return res.status(400).json({ message : "Nom d'utilisateur et mot de passe requis" })
+            if (!username || !password || !email) {
+                return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
             //Construction du DN complet à partir du username
             //const userDN = `uid=${username},ou${}`
 
-            const successLogin = await userService.login(username, password)
+            //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
+            const successLogin = await userService.login(username, email, password)
 
+            //Si le service renvoie true => auth réussi + utilisateur existant donc affichage des données
             if (successLogin) {
+                console.log(successLogin);
                 return res.status(200).json({ message : "Authentification réussie !" })
             } else {
+                //Si non renvoie un code d'erreur
                 return res.status(401).json({ message : "Authentification échouée" })
             }
 

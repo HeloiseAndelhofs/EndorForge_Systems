@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
 
+const { JWT_SECRET } = process.env
 
 
 const userService = {
@@ -21,7 +22,7 @@ const userService = {
             const ad = new ActiveDirectory(adConfig);
             
             //Demande d'authentification de l'utilisateur au LDAP au travers d'une promesse
-            const auth = await new Promise((resolve, reject) => {
+            const auth = await new Promise((resolve) => {
 
                 ad.authenticate(username, password, function(err, auth) {
 
@@ -43,7 +44,7 @@ const userService = {
             //si l'authentification échoue, renvoie false au controller qui affichera un message approprié
             if (!auth) return false
 
-            //Connectioj à la db et création d'une requete
+            //Connection à la db et création d'une requete
             await sql.connect(sqlConfig)
             const req = new sql.Request()
 
@@ -59,8 +60,21 @@ const userService = {
                 return false
             } 
 
-            //Si utilisateur trouvé, renvoie le résultat au controller
-            return result.recordset[0];
+            //Stocke le user
+            const user =  result.recordset[0];
+
+            //A FAIRE : JONCTION TEAM - USER POUR RECUPERER LE NOM DE LA TEAM ET PAS SON ID => POUR LE USER_TEAM ET LE OU
+
+            //Création d'un token
+            const token = jwt.sign({   
+                    id: user.user_id,
+                    role: user.user_role,
+                    team: user.user_team,
+                    email: user.user_email,
+                    username: `uid=${username},ou=${team},dc=endor-forge,dc=local` 
+                },  JWT_SECRET, {expiresIn: '1d'})
+
+            return { user, token }
 
         } catch (error) {
 

@@ -13,6 +13,16 @@ const userController = {
 
         try {
             
+            //Vérification avec le token
+            //const token = req.cookies.token
+
+            //Si un token existe, vérifie sa validité
+            //if (token) {
+              //  const payload = jwt.verify(token, process.env.JWT_SECRET)
+            //}
+
+
+
             //Récupère le username et password du body 
             const { username, email, password } = req.body
 
@@ -21,20 +31,20 @@ const userController = {
                 return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
+
+
             //Construction du DN complet à partir du username
             //const userDN = `uid=${username},ou${}`
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
             const successLogin = await userService.login(username, email, password)
 
-            //Si le service renvoie true => auth réussi + utilisateur existant donc affichage des données
-            if (successLogin) {
-                console.log(successLogin);
-                return res.status(200).json({ message : "Authentification réussie !" })
-            } else {
-                //Si non renvoie un code d'erreur
-                return res.status(401).json({ message : "Authentification échouée" })
+            //Si aucun utilisateur n'est trouvé, retourne une erreur
+            if (!successLogin) {
+                return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
+
+            res.status(200).json({ message: `${username} authentifié` })
 
         } catch (err) {
             console.error("Erreur LDAP : " + err);

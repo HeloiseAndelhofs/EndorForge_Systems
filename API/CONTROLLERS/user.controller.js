@@ -19,7 +19,9 @@ const userController = {
 
             //Si un token existe
             if (token) {
-                const user = await userService.getUserById(token.paylaod.id)
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const user = await userService.getUserById(decoded.id)
+
                 return user
             }
      
@@ -41,11 +43,13 @@ const userController = {
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
             const successLogin = await userService.login(username, email, password)
 
+
             //Si aucun utilisateur n'est trouvé, retourne une erreur
             if (!successLogin) {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
 
+            res.cookie('token', token)
             res.status(200).json({ message: `${username} authentifié` })
 
         } catch (err) {
@@ -54,6 +58,21 @@ const userController = {
         }
 
     },
+
+    logout: (req, res) => {
+
+        try {
+            
+            res.clearCookie('token');
+            return res.status(200).json({ message: 'Déconnexion réussie.' });
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message : "Erreur logout" })
+        }
+
+    },
+
 
     getUsers: async(req, res) => {
         try {

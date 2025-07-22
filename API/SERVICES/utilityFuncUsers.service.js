@@ -16,7 +16,7 @@ const utilityFunctions = {
                         .query(`SELECT u.*, t.*
                                  FROM users u 
                                  JOIN teams t ON u.id_TEAMS = t.id_TEAMS
-                                 WHERE u.user_email = @email}`)
+                                 WHERE u.user_email = @email`)
 
             //Si le résultat est plus petit ou égal à 0 => aucun utilisateur trouvé donc retourne faux
             if (!result.recordset.length <= 0) {

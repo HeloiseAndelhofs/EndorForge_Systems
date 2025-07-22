@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken');
 const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
 
+const utilityFunctions = require('./utilityFuncUsers.service.js')
 const { JWT_SECRET } = process.env
 
 
@@ -44,24 +45,12 @@ const userService = {
             //si l'authentification échoue, renvoie false au controller qui affichera un message approprié
             if (!auth) return false
 
-            //Connection à la db et création d'une requete
-            await sql.connect(sqlConfig)
-            const req = new sql.Request()
+            //On appelle un service pour récupérer les infos utilisateurs
+            const user = await utilityFunctions.getUser(email)
 
-            //Vérifie l'existence de l'utilisateur avec son email
-            const result = await req
-                .input('email', sql.NVarChar, email)
-                .query(`SELECT * FROM users 
-                        WHERE user_email = @email `)
-
-            //Si le résultat est plus petit ou égal à 0 => aucun utilisateur trouvé donc retourne faux
-            if(result.recordset.length <= 0) {
-                console.warn(`L'utilisateur avec l'email : ${email}, n'a pas été retrouvé dans la base de donnée`);
-                return false
-            } 
-
-            //Stocke le user
-            const user =  result.recordset[0];
+            if (!user) {
+                throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
+            }
 
             //A FAIRE : JONCTION TEAM - USER POUR RECUPERER LE NOM DE LA TEAM ET PAS SON ID => POUR LE USER_TEAM ET LE OU
 
@@ -71,14 +60,14 @@ const userService = {
                     role: user.user_role,
                     team: user.user_team,
                     email: user.user_email,
-                    username: `uid=${username},ou=${team},dc=endor-forge,dc=local` 
+                    username: `uid=${username},ou=${user.team_name},dc=endor-forge,dc=local` 
                 },  JWT_SECRET, {expiresIn: '1d'})
 
             return { user, token }
 
         } catch (error) {
 
-            console.log(error + ' ERREUR');
+            console.log(error + ' User service, login ERREUR');
             throw new Error(err.message);
             
         }
@@ -105,6 +94,31 @@ const userService = {
                 console.error(err);
                 throw new Error(err.message)
             }
+        },
+
+        getUserById : async(id) => {
+
+            try {
+
+                await sql.connect(sqlConfig)
+                const request = new sql.Request()
+
+                const result = await request
+                        .input('id', sql.Int, id)
+                        .query(`SELECT * FROM users WHERE user_id = @id`)
+
+
+                if (result.recordset.length <= 0) {
+                    throw new Error(`L'utilisateur n'a pas été trouvé dans la base de données`);
+                }
+
+                return result.recordset[0]
+
+            } catch (err) {
+                console.error(err);
+                throw new Error(err.message)
+            }
+
         }
 
 }

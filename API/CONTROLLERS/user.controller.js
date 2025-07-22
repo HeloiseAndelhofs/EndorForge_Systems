@@ -6,6 +6,7 @@ const userService = require('../SERVICES/user.service')
 const sql = require('mssql')
 const sqlConfig = require('../configs/sql.config')
 const jwt = require('jsonwebtoken')
+const utilityFunctions = require('../SERVICES/utilityFuncUsers.service')
 
 const userController = {
 
@@ -14,13 +15,14 @@ const userController = {
         try {
             
             //Vérification avec le token
-            //const token = req.cookies.token
+            const token = req.cookies.token
 
-            //Si un token existe, vérifie sa validité
-            //if (token) {
-              //  const payload = jwt.verify(token, process.env.JWT_SECRET)
-            //}
-
+            //Si un token existe
+            if (token) {
+                const user = await userService.getUserById(token.paylaod.id)
+                return user
+            }
+     
 
 
             //Récupère le username et password du body 

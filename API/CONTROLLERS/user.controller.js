@@ -3,11 +3,7 @@
 //Dépendances controller
 
 const userService = require('../SERVICES/user.service')
-const sql = require('mssql')
-const sqlConfig = require('../configs/sql.config')
 const jwt = require('jsonwebtoken')
-const utilityFunctions = require('../SERVICES/utilityFuncUsers.service')
-const { json } = require('body-parser')
 
 const userController = {
 
@@ -21,16 +17,30 @@ const userController = {
 
             //Si un token existe
             if (token) {
-                console.log(token + ' : TOKEN');
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                
-                console.log(decoded.id);
-                
-                const user = await userService.getUserById(decoded.id)
-                console.log(user);
-                
 
-                return res.status(200).json({ message : `Utilisateur authentifié par token : ${JSON.stringify(user)}` })
+                try {
+                    
+                    console.log(token + ' : TOKEN');
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                                    
+                    console.log(decoded.id);
+                                    
+                    const user = await userService.getUserById(decoded.id)
+                    console.log(user);
+                                    
+                    
+                    return res.status(200).json(user)
+                    
+                } catch (err) {
+                    //MANIÈRE PROVISOIRE DE GÉRER LE RENOUVELLEMENT DE TOKEN ! VA FALLOIR CRÉER REFRESH TOKEN PLUS TARD !!
+                    if (err === "TokenExpired") {
+                        res.clearCookie('token');
+                        return res.status(200).json({ message: 'Session expirée, veuillez vous reconnecter.' });
+                    } else {
+                        console.error(err);
+                        return res.status(500).json({ message : "Erreur récupération du token." })
+                    }
+                }
             }
 
 
@@ -69,6 +79,7 @@ const userController = {
     logout: (req, res) => {
 
         try {
+            console.log(req.cookies.token.username);
             
             res.clearCookie('token');
             return res.status(200).json({ message: 'Déconnexion réussie.' });
@@ -76,6 +87,29 @@ const userController = {
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message : "Erreur logout" })
+        }
+
+    },
+
+    getYourProfile: async(req, res) => {
+
+        try {
+
+            const token = req.cookies.token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const id = decoded.id
+
+            const user = await userService.getUserById(id)
+
+            if (!user) {
+                return res.status(404).json({ message : "Nous n'avons pas pu trouver votre profil utilisateur." })
+            }
+
+            return res.status(200).json(user)
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message : "Erreur serveur lors de la récupération du profil utilisateur." })
         }
 
     },

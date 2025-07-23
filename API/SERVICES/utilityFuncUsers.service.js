@@ -18,8 +18,14 @@ const utilityFunctions = {
                                  JOIN teams t ON u.id_TEAMS = t.id_TEAMS
                                  WHERE u.user_email = @email`)
 
+
+            console.log('RESULT : ' + JSON.stringify(result.recordset[0]));
+            console.log("LENGHT RECORDSET : " + result.recordset.length);
+            
+            
+
             //Si le résultat est plus petit ou égal à 0 => aucun utilisateur trouvé donc retourne faux
-            if (!result.recordset.length <= 0) {
+            if (result.recordset.length <= 0) {
                 console.warn(`L'utilisateur avec l'email : ${email}, n'a pas été retrouvé dans la base de donnée`);
                 return false
             }

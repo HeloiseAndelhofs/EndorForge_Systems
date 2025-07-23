@@ -7,6 +7,7 @@ const sql = require('mssql')
 const sqlConfig = require('../configs/sql.config')
 const jwt = require('jsonwebtoken')
 const utilityFunctions = require('../SERVICES/utilityFuncUsers.service')
+const { json } = require('body-parser')
 
 const userController = {
 
@@ -16,15 +17,21 @@ const userController = {
             
             //Vérification avec le token
             const token = req.cookies.token
+            
 
             //Si un token existe
             if (token) {
+                console.log(token + ' : TOKEN');
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                
+                console.log(decoded.id);
+                
                 const user = await userService.getUserById(decoded.id)
+                console.log(user);
+                
 
-                return user
+                return res.status(200).json({ message : `Utilisateur authentifié par token : ${JSON.stringify(user)}` })
             }
-     
 
 
             //Récupère le username et password du body 
@@ -49,7 +56,7 @@ const userController = {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
 
-            res.cookie('token', token)
+            res.cookie('token', successLogin.token)
             res.status(200).json({ message: `${username} authentifié` })
 
         } catch (err) {

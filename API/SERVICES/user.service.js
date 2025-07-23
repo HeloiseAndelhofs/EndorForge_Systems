@@ -47,6 +47,8 @@ const userService = {
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)
+            console.log('USER de service user : ' + user);
+            
 
             if (!user) {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
@@ -54,9 +56,12 @@ const userService = {
 
             //A FAIRE : JONCTION TEAM - USER POUR RECUPERER LE NOM DE LA TEAM ET PAS SON ID => POUR LE USER_TEAM ET LE OU
 
+            console.log(JWT_SECRET);
+            
+
             //Création d'un token
             const token = jwt.sign({   
-                    id: user.user_id,
+                    id: user.id_USERS,
                     role: user.user_role,
                     team: user.user_team,
                     email: user.user_email,
@@ -65,9 +70,9 @@ const userService = {
 
             return { user, token }
 
-        } catch (error) {
+        } catch (err) {
 
-            console.log(error + ' User service, login ERREUR');
+            console.log(err + ' User service, login ERREUR');
             throw new Error(err.message);
             
         }
@@ -105,7 +110,7 @@ const userService = {
 
                 const result = await request
                         .input('id', sql.Int, id)
-                        .query(`SELECT * FROM users WHERE user_id = @id`)
+                        .query(`SELECT * FROM users WHERE id_USERS = @id`)
 
 
                 if (result.recordset.length <= 0) {

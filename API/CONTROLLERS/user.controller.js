@@ -2,6 +2,7 @@
 
 //Dépendances controller
 
+const { username } = require('../configs/activeDirectory.config');
 const userService = require('../SERVICES/user.service')
 const jwt = require('jsonwebtoken')
 
@@ -28,12 +29,14 @@ const userController = {
                     const user = await userService.getUserById(decoded.id)
                     console.log(user);
                                     
+                    console.log(token);
                     
                     return res.status(200).json(user)
                     
                 } catch (err) {
                     //MANIÈRE PROVISOIRE DE GÉRER LE RENOUVELLEMENT DE TOKEN ! VA FALLOIR CRÉER REFRESH TOKEN PLUS TARD !!
                     if (err === "TokenExpired") {
+                        //c'est dans le middleware ==> à voir si on garde ça dans le controller
                         res.clearCookie('token');
                         return res.status(200).json({ message: 'Session expirée, veuillez vous reconnecter.' });
                     } else {
@@ -99,6 +102,9 @@ const userController = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const id = decoded.id
 
+            console.log(token);
+            
+
             const user = await userService.getUserById(id)
 
             if (!user) {
@@ -132,6 +138,26 @@ const userController = {
             console.error(err);
             return res.status(500).json({ message: 'Une erreur est survenue lors de la récupération des utilisateurs' })
         }
+    },
+
+    getUserByName: async(req, res) => {
+
+        try {
+            
+            const { username } = req.body
+            const result = await userService.getUserByName(username)
+
+            if (!result) {
+                return res.status(404).json({ message : `Aucun utilisateur avec le nom ${username} n'a été trouvé.` })
+            }
+
+            return res.status(200).json(result)
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message : "Une erreur est survenue lors de la récupération des utilisateurs" })
+        }
+
     }
 
 }

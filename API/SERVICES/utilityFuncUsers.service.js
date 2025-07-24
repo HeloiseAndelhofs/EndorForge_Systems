@@ -15,7 +15,7 @@ const utilityFunctions = {
                         .input('email', sql.NVarChar, email)
                         .query(`SELECT u.*, t.*
                                  FROM users u 
-                                 JOIN teams t ON u.id_TEAMS = t.id_TEAMS
+                                 JOIN teams t ON u.FK_team_id = t.team_id
                                  WHERE u.user_email = @email`)
 
 

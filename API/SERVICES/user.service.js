@@ -61,11 +61,12 @@ const userService = {
 
             //Création d'un token
             const token = jwt.sign({   
-                    id: user.id_USERS,
+                    id: user.user_id,
                     role: user.user_role,
-                    team: user.user_team,
+                    team: user.team_name,
+                    ou: user.team_ou,
                     email: user.user_email,
-                    username: `uid=${username},ou=${user.team_name},dc=endor-forge,dc=local` 
+                    username: `uid=${username},ou=${user.team_ou},dc=endor-forge,dc=local` 
                 },  JWT_SECRET, {expiresIn: '1d'})
 
             return { user, token }
@@ -84,7 +85,6 @@ const userService = {
             try {
                     
             console.log("Service getUsers Hello");
-            console.log(sqlConfig);
             
 
                 await sql.connect(sqlConfig)
@@ -92,6 +92,7 @@ const userService = {
 
                 const result = await request
                     .query(`SELECT * FROM users`)
+                
 
                 return result.recordset[0]
 
@@ -110,7 +111,7 @@ const userService = {
 
                 const result = await request
                         .input('id', sql.Int, id)
-                        .query(`SELECT * FROM users WHERE id_USERS = @id`)
+                        .query(`SELECT * FROM users WHERE user_id = @id`)
 
 
                 if (result.recordset.length <= 0) {

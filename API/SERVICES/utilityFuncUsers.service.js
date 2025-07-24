@@ -2,6 +2,8 @@ const sql = require('mssql');
 const sqlConfig = require('../configs/sql.config.js');
 const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
+const jwt = require('jsonwebtoken')
+const { JWT_SECRET } = process.env
 
 const utilityFunctions = {
 
@@ -33,9 +35,30 @@ const utilityFunctions = {
             return result.recordset[0]
     
         } catch (err) {
-            console.error('User serice, getUser : ' + err);
+            console.error('UTILITY SERVICE, getUser : ' + err);
             throw new Error(err.message)
         }
+    },
+
+    newToken: (user) => {
+
+        try {
+            const accessToken = jwt.sign({
+                id: user.user_id,
+                role: user.user_role,
+                team: user.team_name,
+                ou: user.team_ou,
+                email: user.user_email,
+                username: `uid=${user.user_name},ou=${user.team_ou},dc=endor-forge,dc=local`
+            }, JWT_SECRET, { expiresIn: '15m' })
+
+            return accessToken
+
+        } catch (err) {
+            console.error(err + " : ERREUR NEW TOKEN, UTILITY SERVICE");
+            throw new Error(err.message)
+        }
+
     }
 
 

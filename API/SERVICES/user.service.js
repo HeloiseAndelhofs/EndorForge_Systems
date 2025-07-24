@@ -4,13 +4,10 @@
 
 const sql = require('mssql');
 const sqlConfig = require('../configs/sql.config.js');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
 
 const utilityFunctions = require('./utilityFuncUsers.service.js')
-const { JWT_SECRET } = process.env
 
 
 const userService = {
@@ -53,18 +50,7 @@ const userService = {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
             }
 
-
-            //Création d'un token
-            const token = jwt.sign({   
-                    id: user.user_id,
-                    role: user.user_role,
-                    team: user.team_name,
-                    ou: user.team_ou,
-                    email: user.user_email,
-                    username: `uid=${username},ou=${user.team_ou},dc=endor-forge,dc=local` 
-                },  JWT_SECRET, {expiresIn: '1d'})
-
-            return { user, token }
+            return user
 
         } catch (err) {
 

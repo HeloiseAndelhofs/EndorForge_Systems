@@ -2,9 +2,10 @@
 
 //Dépendances controller
 
-const { username } = require('../configs/activeDirectory.config');
+const authService = require('../SERVICES/auth.service')
 const userService = require('../SERVICES/user.service')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
 
 const userController = {
 
@@ -12,41 +13,6 @@ const userController = {
 
         try {
             
-            //Vérification avec le token
-            const token = req.cookies.token
-            
-
-            //Si un token existe
-            if (token) {
-
-                try {
-                    
-                    console.log(token + ' : TOKEN');
-                    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                                    
-                    console.log(decoded.id);
-                                    
-                    const user = await userService.getUserById(decoded.id)
-                    console.log(user);
-                                    
-                    console.log(token);
-                    
-                    return res.status(200).json(user)
-                    
-                } catch (err) {
-                    //MANIÈRE PROVISOIRE DE GÉRER LE RENOUVELLEMENT DE TOKEN ! VA FALLOIR CRÉER REFRESH TOKEN PLUS TARD !!
-                    if (err === "TokenExpired") {
-                        //c'est dans le middleware ==> à voir si on garde ça dans le controller
-                        res.clearCookie('token');
-                        return res.status(200).json({ message: 'Session expirée, veuillez vous reconnecter.' });
-                    } else {
-                        console.error(err);
-                        return res.status(500).json({ message : "Erreur récupération du token." })
-                    }
-                }
-            }
-
-
             //Récupère le username et password du body 
             const { username, email, password } = req.body
 
@@ -69,8 +35,13 @@ const userController = {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
 
-            res.cookie('token', successLogin.token)
-            res.status(200).json({ message: `${username} authentifié` })
+            //renvoie du token d'accès
+            res.cookie('accessToken', successLogin.accessToken) //FAIRE UNE MEILLEURE SECURITE AVEC LES OPTIONS
+
+            //renvoie le token d'actualisation
+            res.cookie('refreshToken', successLogin.refreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
+
+            return res.status(200).json({ message: `${username} authentifié` })
 
         } catch (err) {
             console.error("Erreur LDAP : " + err);
@@ -84,12 +55,37 @@ const userController = {
         try {
             console.log(req.cookies.token.username);
             
-            res.clearCookie('token');
+            res.clearCookie('accessToken');
+            res.clearCookie('refreshToken')
             return res.status(200).json({ message: 'Déconnexion réussie.' });
 
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message : "Erreur logout" })
+        }
+
+    },
+
+    refreshToken: async(req, res) => {
+
+         try {
+
+            const refreshToken = req.cookies.refreshToken;
+
+            if (!refreshToken) return res.status(401).json({ message: "Aucun token de rafraîchissement." });
+
+            const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            const user = await userService.getUserById(decoded.id);
+
+            if (!user) return res.status(403).json({ message: "Utilisateur introuvable." });
+
+            const newAccessToken = authService.createAccessToken(user);
+            
+            res.cookie('accessToken', newAccessToken);
+            return res.status(200).json({ message: "Token actualisé." });
+
+        } catch (err) {
+            return res.status(403).json({ message: "Refresh token invalide ou expiré." });
         }
 
     },

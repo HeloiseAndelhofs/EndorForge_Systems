@@ -150,7 +150,13 @@ const userController = {
 
         try {
             
-            const { username } = req.body
+            const { username } = req.query
+            console.log(username);
+            
+            if (!username) {
+                return res.status(400).json({ message : "Aucun utilisateur recherché." })
+            }
+
             const result = await userService.getUserByName(username)
 
             if (!result) {

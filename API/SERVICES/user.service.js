@@ -29,6 +29,8 @@ const userService = {
                     //Si authentification ok, résous la promesse en retournant true pour continuer la procédure
                     if (auth) {
                     console.log(`${username} authentifié !`);
+                    console.log(auth);
+                    
                     return resolve(true);
 
                     //Si authentification n'est pas ok => échec de l'auth
@@ -39,6 +41,7 @@ const userService = {
                 });
 
             });
+            
 
             //si l'authentification échoue, renvoie false au controller qui affichera un message approprié
             if (!auth) return false

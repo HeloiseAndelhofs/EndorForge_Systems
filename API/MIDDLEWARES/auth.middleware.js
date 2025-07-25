@@ -13,7 +13,8 @@ const auth = async (req, res, next) => {
     }
 
     try {
-
+        console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE TOUS LES TOKENS SONT BONS");
+        
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
         req.payload = decoded;
         return next();
@@ -21,20 +22,25 @@ const auth = async (req, res, next) => {
     } catch (err) {
 
         if (err.name === "TokenExpiredError") {
+            console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE ERR TOKEN EXPIRED");
+            
             if (!refreshToken) {
+                console.log("MIDDLEWARE, PAS DE TOKEN");
+                
                 return res.status(401).json({ message: "Token expiré et aucun refreshToken, veuillez vous reconnecter." });
             }
 
             try {
-
+                console.log("MIDDLEWARE, CREATION D'UN NOUVEAU ACCESS TOKEN");
+                
                 const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-
+                
                 const user = await userService.getUserById(decodedRefresh.id);
-
+                
                 if (!user) {
                     return res.status(403).json({ message: "Utilisateur non trouvé." });
                 }
-
+                
                 // Nouveau access token
                 const newAccessToken = utilityFunctions.newToken(user);
 

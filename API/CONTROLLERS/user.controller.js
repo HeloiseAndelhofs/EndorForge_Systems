@@ -21,13 +21,14 @@ const userController = {
                 return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
-
+            const accessToken = req.cookies.accessToken
+            const refreshToken = req.cookies.refreshToken
 
             //Construction du DN complet à partir du username
             //const userDN = `uid=${username},ou${}`
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
-            const successLogin = await userService.login(username, email, password)
+            const successLogin = await userService.login(username, email, password, accessToken, refreshToken)
 
 
             //Si aucun utilisateur n'est trouvé, retourne une erreur
@@ -35,11 +36,20 @@ const userController = {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
 
+            if (accessToken && refreshToken) {
+                return res.redirect('/endor/yourProfile')
+            }
+
+            console.log("ACCESS TOKEN CONTROLLER : " + successLogin.newAccessToken);
+            console.log("REFRESH TOKEN CONTROLLER : " + successLogin.newRefreshToken);
+            
+            
+
             //renvoie du token d'accès
-            res.cookie('accessToken', successLogin.accessToken) //FAIRE UNE MEILLEURE SECURITE AVEC LES OPTIONS
+            res.cookie('accessToken', successLogin.newAccessToken) //FAIRE UNE MEILLEURE SECURITE AVEC LES OPTIONS
 
             //renvoie le token d'actualisation
-            res.cookie('refreshToken', successLogin.refreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
+            res.cookie('refreshToken', successLogin.newRefreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
 
             return res.status(200).json({ message: `${username} authentifié` })
 

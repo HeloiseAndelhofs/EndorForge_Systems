@@ -7,12 +7,13 @@ const sqlConfig = require('../configs/sql.config.js');
 const ActiveDirectory = require('activedirectory')
 const adConfig = require('../configs/activeDirectory.config');
 
-const utilityFunctions = require('./utilityFuncUsers.service.js')
+const utilityFunctions = require('./utilityFuncUsers.service.js');
+const authService = require('./auth.service.js');
 
 
 const userService = {
     
-    login: async (username, email, password) => {
+    login: async (username, email, password, accessToken, refreshToken) => {
         
         console.log('SALUT!!!!!');
         try {
@@ -48,6 +49,18 @@ const userService = {
 
             if (!user) {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
+            }
+
+            if (!accessToken && !refreshToken) {
+                const newAccessToken = await authService.createAccessToken(user)
+                const newRefreshToken = await authService.createRefreshToken(user)
+
+                console.log('TOKEN USER SERVICE ' + newAccessToken);
+                console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
+                
+                
+
+                return { user, newAccessToken, newRefreshToken }
             }
 
             return user

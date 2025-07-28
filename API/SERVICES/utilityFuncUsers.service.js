@@ -57,6 +57,29 @@ const utilityFunctions = {
             throw new Error(err.message)
         }
 
+    },
+
+    getTeamId: async(ou) => {
+        try {
+
+            await sql.connect(sqlConfig)
+
+            const teamID = await new sql.Request()
+                    .input('ou', sql.VarChar(100), ou)
+                    .query(`SELECT team_id FROM TEAMS
+                        WHERE team_name = @ou`)
+
+            if (!teamID) {
+                console.error("Aucune team trouvée avec ce nom");
+                throw new Error('Pas de team')
+            }
+
+            return teamID.recordset[0]
+
+        } catch (err) {
+            console.error(err);
+            throw new Error("Erreur serveur pendant la récupération de la team")
+        }
     }
 
 

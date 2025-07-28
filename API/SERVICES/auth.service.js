@@ -24,7 +24,7 @@ const authService = {
 
     createRefreshToken: (user) => {
         
-        const refreshToken = jwt.sign({ id: user.user_id }, JWT_REFRESH_SECRET, { expiresIn: '14d' });
+        const refreshToken = jwt.sign({ id: user.user_id, email: user.user_email }, JWT_REFRESH_SECRET, { expiresIn: '14d' });
 
         return refreshToken
     }

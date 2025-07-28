@@ -14,10 +14,13 @@ const auth = async (req, res, next) => {
 
     try {
         console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE TOUS LES TOKENS SONT BONS");
-        
+
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-        req.payload = decoded;
-        return next();
+
+        if (decoded) {
+            req.payload = decoded;
+            return next();
+        }
 
     } catch (err) {
 
@@ -34,6 +37,7 @@ const auth = async (req, res, next) => {
                 console.log("MIDDLEWARE, CREATION D'UN NOUVEAU ACCESS TOKEN");
                 
                 const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+                console.log(decodedRefresh);
                 
                 const user = await utilityFunctions.getUser(decodedRefresh.email);
                 

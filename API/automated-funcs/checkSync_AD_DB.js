@@ -31,6 +31,27 @@ const ad_db_func =  {
 
         console.log(usersDB.recordset, searchEntries);
         
+
+       for (const userDB of usersDB.recordset) {
+        const matchInAD = searchEntries.find(userAD => userAD.mail === userDB.user_email)
+
+        if (!matchInAD) {
+          console.warn(`L'utilisateur avec le mail ${userDB.user_email} est dans la base de donnée mais pas dans l'ad`);
+          return
+        }
+        console.log(`FOR USERS DB : L'utilisateur avec le mail ${userDB.user_email} se trouve bien dans l'ad et la db`);
+       }
+
+       for (const userAD of searchEntries) {
+          const matchInDB = usersDB.recordset.find(userDB => userDB.user_email === userAD.mail)
+
+          if (!matchInDB) {
+            console.warn(`L'utilisateur avec le mail ${userAD.mail} est dans l'AD mais pas dans la DB`);
+            return
+          }
+        console.log(`FOR USERS AD : L'utilisateur avec le mail ${userAD.mail} se trouve bien dans l'ad et la db`);
+       }
+        
         
         
       } catch (err) {

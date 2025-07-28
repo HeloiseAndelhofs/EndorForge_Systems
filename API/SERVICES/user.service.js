@@ -47,7 +47,6 @@ const userService = {
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)
-            console.log("Log après user");
             
 
             if (!user) {

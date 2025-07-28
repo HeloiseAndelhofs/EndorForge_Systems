@@ -63,7 +63,6 @@ const userController = {
     logout: (req, res) => {
 
         try {
-            console.log(req.cookies.token.username);
             
             res.clearCookie('accessToken');
             res.clearCookie('refreshToken')
@@ -103,14 +102,14 @@ const userController = {
     getYourProfile: async(req, res) => {
 
         try {
-
-            const token = req.cookies.token
+            console.log("CONTROLLER");
+            
+            const token = req.cookies.accessToken
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const id = decoded.id
 
             console.log(token);
             
-
             const user = await userService.getUserById(id)
 
             if (!user) {

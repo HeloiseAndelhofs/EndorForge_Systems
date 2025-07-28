@@ -1,7 +1,5 @@
 const sql = require('mssql');
 const sqlConfig = require('../configs/sql.config.js');
-const ActiveDirectory = require('activedirectory')
-const adConfig = require('../configs/activeDirectory.config');
 const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = process.env
 

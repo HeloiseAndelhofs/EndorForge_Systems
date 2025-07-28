@@ -10,34 +10,34 @@ const ad_db_func =  {
   
   syncCheck : async() => {
     
+    await sql.connect(sqlConfig)
+    const ad = await new Client({url: adConfig.url, tlsOptions : adConfig.tlsOptions})
+
     try {
-        await sql.connect(sqlConfig)
-      
-        const ad = new Client({url: adConfig.url, tlsOptions : adConfig.tlsOptions})
         console.log(ad);
         
         await ad.bind(adConfig.bindDN, adConfig.bindCredentials)
       
-        
-        //Vérifier si un groupe existe
-        const groupCN = 'users-endor'; // à adapter selon ton nom réel
+        const usersDB = await new sql.Request()
+                .query(`SELECT u.*, t.*
+                        FROM users u 
+                        JOIN teams t ON u.FK_team_id = t.team_id`)
 
-        const { searchEntries: groupEntries } = await ad.search(adConfig.baseDN, {
-          scope: 'sub',
-          filter: `(cn=${groupCN})`,
-          attributes: ['dn', 'cn'],
+        const { searchEntries } = await ad.search(adConfig.baseDN, {
+            scope: 'sub',
+            filter: '(objectClass=person)', // ou 'user' selon ton schéma
+            attributes: ['uid', 'cn', 'mail'],
         });
 
-        if (groupEntries.length === 0) {
-          console.log(`Groupe "${groupCN}" introuvable`);
-        } else {
-          console.log(`Groupe "${groupCN}" trouvé :`, groupEntries[0].dn);
-        }
+        console.log(usersDB.recordset, searchEntries);
+        
         
         
       } catch (err) {
         console.error(err);
         throw new Error(err)
+      } finally {
+        await ad.unbind()
       }
     }
     

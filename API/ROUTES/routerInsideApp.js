@@ -10,7 +10,7 @@ router.get('/logout', userController.logout)
 router.get('/yourProfile', auth, userController.getYourProfile)
 router.get('/searchUser', auth, userController.getUserByName)
 
-const sync = require('../automated-funcs/checkSync_AD_DB')
-router.get('/testSync', sync.module.syncCheck)
+const ad_db_func = require('../automated-funcs/checkSync_AD_DB')
+router.get('/testSync', ad_db_func.syncCheck)
 
 module.exports = router

@@ -35,7 +35,7 @@ const auth = async (req, res, next) => {
                 
                 const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
                 
-                const user = await userService.getUserById(decodedRefresh.id);
+                const user = await utilityFunctions.getUser(decodedRefresh.email);
                 
                 if (!user) {
                     return res.status(403).json({ message: "Utilisateur non trouvé." });

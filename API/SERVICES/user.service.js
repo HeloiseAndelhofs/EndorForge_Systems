@@ -4,7 +4,7 @@
 
 const sql = require('mssql');
 const sqlConfig = require('../configs/sql.config.js');
-const ActiveDirectory = require('activedirectory')
+const { Client } = require('ldapts')
 const adConfig = require('../configs/activeDirectory.config');
 
 const utilityFunctions = require('./utilityFuncUsers.service.js');
@@ -18,36 +18,36 @@ const userService = {
         console.log('SALUT!!!!!');
         try {
             //Connexion à l'active directory
-            const ad = new ActiveDirectory(adConfig);
+            const ad = new Client({url : adConfig.url, tlsOptions : adConfig.tlsOptions});
             
-            //Demande d'authentification de l'utilisateur au LDAP au travers d'une promesse
-            const auth = await new Promise((resolve) => {
+            await ad.bind(adConfig.bindDN, adConfig.bindCredentials)
 
-                ad.authenticate(username, password, function(err, auth) {
-
-
-                    //Si authentification ok, résous la promesse en retournant true pour continuer la procédure
-                    if (auth) {
-                    console.log(`${username} authentifié !`);
-                    console.log(auth);
-                    
-                    return resolve(true);
-
-                    //Si authentification n'est pas ok => échec de l'auth
-                    } else {
-                    console.log("Échec de l'authentification, login ou mot de passe incorrect");
-                    return resolve(false);
-                    }
-                });
-
+            // Rechercher l'utilisateur (récupérer son DN)
+            const { searchEntries } = await ad.search(adConfig.baseDN, {
+            scope: 'sub',
+            filter: `(mail=${email})`,
+            attributes: ['dn', 'cn'],
             });
+
+            console.log(searchEntries[0].dn);
             
 
-            //si l'authentification échoue, renvoie false au controller qui affichera un message approprié
-            if (!auth) return false
+            if (searchEntries.length === 0) {
+                throw new Error("Utilisateur introuvable");
+            }
+
+            const userDN = searchEntries[0].dn;
+
+            if (!userDN) {
+                return false
+            }    
+
+            // 3. Rebind avec les identifiants utilisateur
+            await ad.bind(userDN, password);
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)
+            console.log("Log après user");
             
 
             if (!user) {
@@ -55,6 +55,7 @@ const userService = {
             }
 
             if (!accessToken && !refreshToken) {
+                
                 const newAccessToken = await authService.createAccessToken(user)
                 const newRefreshToken = await authService.createRefreshToken(user)
 

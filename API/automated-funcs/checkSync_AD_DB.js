@@ -40,6 +40,9 @@ const ad_db_func =  {
           attributes: ['cn', 'member'],
         });
 
+
+        //FONCTIONS POUR RÉCUPÉRER LES GROUPES D'UN USER
+        // Map : user DN => liste de groupes
         const userGroupsMap = {};
 
         for (const group of groupEntries) {
@@ -52,6 +55,25 @@ const ad_db_func =  {
             }
             userGroupsMap[memberDN].push(groupName);
           }
+        }
+
+
+        //RÉCUPERER LES TYPES DE CONTRAT
+        function getContractType(groups) {
+          if(!groups) return false
+          if(groups.includes('COOKIES')) return 'COOKIES' 
+          if(groups.includes('CDI')) return 'CDI'
+          if(groups.includes('CDD')) return 'CDD'
+        }
+
+        //RÉCUPERE LES ROLES
+        function getUserRole(groups) {
+          if(!groups) return false
+          if(groups.includes('RABADON')) return 'RABADON'
+          if(groups.includes('TRINITE')) return 'TRINITE'
+          if(groups.includes('MERCURE')) return 'MERCURE'
+          if(groups.includes('COOKIES')) return 'COOKIES'
+          if(groups.includes('PINKWARD')) return 'PINKWARD'
         }
 
 
@@ -76,23 +98,52 @@ const ad_db_func =  {
 
             const firstname = cnSplit[1]
 
-            const role = userGroupsMap[userAD.dn];//IL VA SUREMENT RESSORTIR LE CONTRAT AUSSI
+            const loginName = userAD.uid
+            const mail = userAD.mail
+
+            const groups = userGroupsMap[userAD.dn]
+
+            const contractType = getContractType(groups); // stage / CDD / CDI
+            const role = getUserRole(groups); // admin / user / etc.
+
 
             const match = userAD.dn.match(/ou=([^,]+)/i);
             const ou = match ? match[1] : null;
             const teamID = await utilityFunctions.getTeamId(ou)
+            console.log(loginName, mail);
+            console.log(userAD);
+            console.log(role);
+            
+            
+            
+
+            const isActive = true
+            const birthday = '1985-04-17' //A CHANGER
 
             const req = new sql.Request()
             const addUser = await req
                   .input('name', sql.VarChar(100), name)
                   .input('firstname', sql.VarChar(100), firstname)
-                  .input('loginName', sql.VarChar(100), userAD.uid)
-                  .input('email', sql.VarChar(255), userAD.mail)
+                  .input('loginName', sql.VarChar(100), loginName)
+                  .input('email', sql.VarChar(255), mail)
+                  .input('birthday', sql.Date, birthday)
                   .input('role', sql.VarChar(50), role)
-                  .input()
+                  .input('isActive', sql.Bit, isActive)
+                  .input('createdAt', sql.DateTime, new Date())
+                  .input('updatedAt', sql.DateTime, new Date())
+                  .input('contract', sql.VarChar(50), contractType)
+                  .input('teamID', sql.Int, teamID)
                   
+                  .query(`
+                    INSERT INTO USERS (
+                    user_name, user_firstname, user_login_name, user_email, user_birthdate, user_role,
+                    user_isActive, user_createdAt, user_updatedAt, user_contract_type, FK_team_id
+                    )
+                    VALUES (@name, @firstname, @loginName, @email, @birthday, @role,
+                    @isActive, @createdAt, @updatedAt, @contract, @teamID)
+                    `)
 
-            return
+            return JSON.stringify(addUser)
           }
         console.log(`FOR USERS AD : L'utilisateur avec le mail ${userAD.mail} se trouve bien dans l'ad et la db`);
        }

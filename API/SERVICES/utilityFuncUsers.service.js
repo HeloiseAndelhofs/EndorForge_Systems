@@ -67,14 +67,14 @@ const utilityFunctions = {
             const teamID = await new sql.Request()
                     .input('ou', sql.VarChar(100), ou)
                     .query(`SELECT team_id FROM TEAMS
-                        WHERE team_name = @ou`)
+                        WHERE team_ou = @ou`)
 
             if (!teamID) {
                 console.error("Aucune team trouvée avec ce nom");
                 throw new Error('Pas de team')
             }
 
-            return teamID.recordset[0]
+            return teamID.recordset[0].team_id
 
         } catch (err) {
             console.error(err);

@@ -1,6 +1,5 @@
 // MIDDLEWARES/auth.js
 const jwt = require('jsonwebtoken');
-const userService = require('../SERVICES/user.service');
 const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
 
 const auth = async (req, res, next) => {

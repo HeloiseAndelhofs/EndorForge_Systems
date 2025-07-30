@@ -2,8 +2,11 @@ const sql = require('mssql')
 const sqlConfig = require('../configs/sql.config.js');
 const { Client } = require('ldapts')
 const adConfig = require('../configs/activeDirectory.config');
-const cron = require('node-cron');
 const utilityFunctions = require('../SERVICES/utilityFuncUsers.service.js');
+
+
+let datasLog = []
+
 
 //Vérifie que les utilisateurs de l'ad sont bien dans la DB
 
@@ -87,6 +90,7 @@ const ad_db_func =  {
         console.log(`FOR USERS DB : L'utilisateur avec le mail ${userDB.user_email} se trouve bien dans l'ad et la db`);
        }
 
+
        for (const userAD of userEntries) {
           const matchInDB = usersDB.recordset.find(userDB => userDB.user_email === userAD.mail)
 
@@ -142,19 +146,20 @@ const ad_db_func =  {
                     VALUES (@name, @firstname, @loginName, @email, @birthday, @role,
                     @isActive, @createdAt, @updatedAt, @contract, @teamID)
                     `)
-
-            return JSON.stringify(addUser)
+                    
+            datasLog.push(`${userAD.uid} n'a pas été trouvé dans la DB, son profil vient d'être créé.`, userAD, addUser)
           }
+
         console.log(`FOR USERS AD : L'utilisateur avec le mail ${userAD.mail} se trouve bien dans l'ad et la db`);
        }
         
-        
-        
       } catch (err) {
+        datasLog.push(`Une erreure s'est produite lors de la synchronisation AD - DB, ${err}`)
         console.error(err);
         throw new Error(err)
       } finally {
         await ad.unbind()
+        return datasLog
       }
     }
     

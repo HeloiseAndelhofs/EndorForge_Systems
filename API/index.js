@@ -6,6 +6,7 @@ const http = require('http')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 
+
 const app = express()
 const { PORT } = process.env
 
@@ -22,6 +23,8 @@ app.use(cookieParser())
 app.use(express.json())
 app.use('/api', router)
 
+
+require('./automated-funcs/cron.schedule')
 
 
 

@@ -58,6 +58,7 @@ const userService = {
                 const newAccessToken = await authService.createAccessToken(user)
                 const newRefreshToken = await authService.createRefreshToken(user)
 
+
                 console.log('TOKEN USER SERVICE ' + newAccessToken);
                 console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
                 
@@ -73,6 +74,9 @@ const userService = {
             console.log(err + ' User service, login ERREUR');
             throw new Error(err.message);
             
+        } finally {
+
+            await ad.unbind()
         }
         
         },

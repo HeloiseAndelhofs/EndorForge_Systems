@@ -5,6 +5,7 @@ const router = require('./ROUTES/router')
 const http = require('http')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const fileUpload = require('express-fileupload')
 
 
 const app = express()
@@ -19,8 +20,14 @@ app.use(cors({
     credentials: true, 
 }));
 
+app.use(fileUpload({
+    limits: { fileSize: 5 * 1024 * 1024,
+              files: 1
+     }
+}))
 app.use(cookieParser())
 app.use(express.json())
+
 app.use('/api', router)
 
 

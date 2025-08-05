@@ -1,0 +1,11 @@
+services:
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    ports:
+      - "127.0.0.1:3310:3310"  # accessible seulement localement
+    environment:
+      - CLAMD_START=true
+    volumes:
+      - ../FILES/tmp:/tmp  # ajusté au bon chemin relatif depuis le dossier docker
+    restart: unless-stopped

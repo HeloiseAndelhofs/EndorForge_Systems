@@ -1,142 +1,162 @@
-const jwt = require('jsonwebtoken')
-const path = require('path')
-const FileType = require('file-type')
-const clamav = require('clamscan')
+const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs').promises;
+//const { exec } = require('child_process');
+const FileType = require('file-type');
+const initClamscan = require('../configs/clamscan.config')
+const filesService = require('../SERVICES/files.service');
+//const clamscan = require('../configs/clamscan.config');
 
-const options = {
-    remove_infected: true,
-    quarantine_infected: true,
-    scan_log: "/home/hlo/Documents/code/EndorForge_utils/logs_files", 
-    debug_mode: true
-};
-
-const filesService = require('../SERVICES/files.service')
-
+let tmpPath = null;
 
 const filesController = {
-
   uploadFile: async (req, res) => {
     try {
-      
 
+      //Vérifie si un fichier a bien été posté
       if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send("Aucun fichier n'a été posté.");
       }
 
       const file = req.files.myFile;
+      console.log(req.files);
+      
+      console.log(file);
+      
 
-      
-      // Détection réelle du type MIME
-      const detectedType = await FileType.fromBuffer(file.data);
-      
+      // Analyse le type MIME réel à partir du buffer
+      const detectedType = await FileType.fileTypeFromBuffer(file.data);
       if (!detectedType) {
-          return res.status(400).json({ message: "Type de fichier non détecté." });
-        }
-        
-        const extension = path.extname(file.name).toLowerCase(); // e.g. ".jpg"
-        const baseName = path.basename(file.name, extension).replace(/[^a-zA-Z0-9-_]/g, '_');
-        
-        const token = req.cookies.accessToken;
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const uploaderName = decoded.username;
-        
-        const filePath = `${uploaderName}_${baseName}${extension}`;
-        const relativePath = `filesUploaded/${filePath}`;
-        const uploadPath = path.join(__dirname, '../filesUploaded', filePath);
-        
-        //Scan le fichier pour virus
-        const scanner = clamav.createScanner("/usr/bin/clamscan", options);
-        scanner.scan(file, function(err, file, isInfected) {
-              if (err) {
-              console.log("Error scanning file: ", err);
-              } else if (isInfected) {
-              console.log("File is infected:", file);
-              } else {
-              console.log("File is clean:", file);
-              }
-            });
+        return res.status(400).json({ message: "Type de fichier non détecté." });
+      }
 
+      console.log(detectedType);
+      
 
-        const allowedMIMEs = [
-            "application/pdf",
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "image/jpeg",
-            "image/png",
-            "application/vnd.oasis.opendocument.text",
-            "image/gif"
-        ];
-        
-        const allowedExtensions = [
-            ".pdf",
-            ".xls", ".xlsx",
-        ".pptx",
-        ".docx",
-        ".jpg", ".jpeg",
-        ".png",
-        ".odt",
-        ".gif"
-      ];
+      const extension = path.extname(file.name).toLowerCase(); // ex. ".jpg"
+      const baseName = path
+        .basename(file.name, extension)
+        .replace(/[^a-zA-Z0-9_]/g, '_') //n'autorise que les caractères a => z, A => Z, 0 => 9 et _, ce qui n'est pas la dedans est remplacé par un _
+        .toLowerCase();
 
-      // Limite de taille
+      // Prévient contre les extensions doubles (ex: "truc.jpg.php")
+      const safeExt = '.' + detectedType.ext; // Ex : .jpg ou .docx
+      if (extension !== safeExt) {
+        return res.status(403).json({ message: "Extension incohérente avec le type réel." });
+      }
+
+      // Vérifie taille (max 5Mo ici)
       if (file.size > 5 * 1024 * 1024) {
         return res.status(413).json({ message: "Fichier trop volumineux." });
       }
 
-      // Vérification MIME type (réel + déclaré)
+      //Types MIMES et extensions autorisées
+      const allowedMIMEs = [
+        "application/pdf",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/png",
+        "application/vnd.oasis.opendocument.text",
+        "image/gif"
+      ];
+
+      const allowedExtensions = [
+        ".pdf", ".xls", ".xlsx", ".pptx", ".docx",
+        ".jpg", ".jpeg", ".png", ".odt", ".gif"
+      ];
+
+      // Vérification des types autorisés
       if (
         !allowedMIMEs.includes(file.mimetype) ||
-        !allowedMIMEs.includes(detectedType.mime)
+        !allowedMIMEs.includes(detectedType.mime) ||
+        !allowedExtensions.includes(extension)
       ) {
-        return res.status(403).json({ message: "Type MIME non autorisé." });
+        return res.status(403).json({ message: "Type ou extension non autorisé." });
       }
 
-      // Vérification extension
-      if (!allowedExtensions.includes(extension)) {
-        return res.status(403).json({ message: "Extension de fichier non autorisée." });
-      }
-
-      // Incohérence MIME déclaré vs réel
+      // Vérifie cohérence entre MIME déclaré (par le navigateur) et MIME réel
       if (file.mimetype !== detectedType.mime) {
+        return res.status(403).json({ message: "Type MIME déclaré incohérent avec le type réel." });
+      }
+
+      // Authentification utilisateur
+      const token = req.cookies.accessToken;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const uploaderName = decoded.username;
+
+      //Prépare les chemins fichiers
+      const finalFileName = `${uploaderName}_${baseName}${extension}`;
+      const finalPath = path.join(__dirname, '../FILES/filesUploaded', finalFileName);
+      const relativePath = `filesUploaded/${finalFileName}`;
+      
+      // Dans dossier temopraire pour analyse antivirus
+      tmpPath = path.join(__dirname, '../FILES/tmp', finalFileName);
+      await fs.writeFile(tmpPath, file.data);
+
+      // Scan ClamAV sur fichier temporaire
+      const clamscan = await initClamscan()
+      const { isInfected, viruses } = await clamscan.isInfected(tmpPath);
+      if (isInfected) {
+
+        await fs.unlink(tmpPath); // supprime le fichier infecté
         return res.status(403).json({
-          message: "Incohérence entre le type MIME déclaré et le type réel du fichier.",
+          message: "Fichier infecté détecté.",
+          viruses
+
         });
       }
 
-      //Sauvegarde sur le disque
-      await file.mv(uploadPath);
 
-      //Enregistrement DB
-      await filesService.putFileDB(file.name, relativePath, decoded.id, file.mimetype, file.size);
+      // Déplace le fichier validé dans le dossier final
+      await fs.rename(tmpPath, finalPath);
+      tmpPath = null //Plus besoin de supprimer (déplacer correcetment dans dossier permanent)
 
-      return res.send('Fichier uploadé avec succès');
+      // Enregistre en base de données
+      await filesService.putFileDB(
+        file.name,
+        relativePath,
+        decoded.id,
+        file.mimetype,
+        file.size
+      );
+
+      return res.send("Fichier uploadé avec succès.");
+
     } catch (err) {
-      console.error("Erreur serveur lors de l'upload du fichier : " + err);
-      return res.status(500).json({ message: "Erreur serveur lors de l'upload du fichier" });
+      console.error("Erreur serveur lors de l'upload : " + err);
+
+      // Supprime le fichier temporaire s'il y a eu une erreur
+      if (tmpPath) {
+        try {
+          await fs.unlink(tmpPath);
+        } catch (cleanupErr) {
+          console.warn("Fichier temporaire non supprimé :", cleanupErr.message);
+        }
+      }
+
+      return res.status(500).json({ message: err.message || "Erreur serveur lors de l'upload" });
     }
   },
 
-    getFiles: async(req, res) => {
-        try {
-            
-
-
-        } catch (err) {
-            console.error("Erreur serveur lors de la récuperation des fichiers : " + err);
-            return res.status(500).json({ message: "Erreur serveur lors de la récuperation des fichiers" })
-        }
-    },
-
-    downloadFiles: async(req, res) => {
-        try {
-            
-        } catch (err) {
-            console.error("Erreur serveur lorss du téléchargement des fichiers : " + err);
-            return res.status(500).json({ message: "Erreur lors de la récuperation des fichiers" })
-        }
+  getFiles: async (req, res) => {
+    try {
+      // à implémenter plus tard
+    } catch (err) {
+      console.error("Erreur serveur lors de la récupération des fichiers : " + err);
+      return res.status(500).json({ message: "Erreur serveur lors de la récupération des fichiers" });
     }
+  },
 
-}
+  downloadFiles: async (req, res) => {
+    try {
+      // à implémenter plus tard
+    } catch (err) {
+      console.error("Erreur serveur lors du téléchargement des fichiers : " + err);
+      return res.status(500).json({ message: "Erreur lors de la récupération des fichiers" });
+    }
+  }
+};
 
-module.exports = filesController
+module.exports = filesController;

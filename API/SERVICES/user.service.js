@@ -10,6 +10,7 @@ const adConfig = require('../configs/activeDirectory.config');
 const utilityFunctions = require('./utilityFuncUsers.service.js');
 const authService = require('./auth.service.js');
 
+let ad;
 
 const userService = {
     
@@ -18,15 +19,15 @@ const userService = {
         console.log('SALUT!!!!!');
         try {
             //Connexion à l'active directory
-            const ad = new Client({url : adConfig.url, tlsOptions : adConfig.tlsOptions});
+            ad = new Client({url : adConfig.url, tlsOptions : adConfig.tlsOptions});
             
             await ad.bind(adConfig.bindDN, adConfig.bindCredentials)
 
             // Rechercher l'utilisateur (récupérer son DN)
             const { searchEntries } = await ad.search(adConfig.baseDN, {
-            scope: 'sub',
-            filter: `(mail=${email})`,
-            attributes: ['dn', 'cn'],
+                scope: 'sub',
+                filter: `(mail=${email})`,
+                attributes: ['dn', 'cn'],
             });
 
             console.log(searchEntries[0].dn);
@@ -52,20 +53,22 @@ const userService = {
             if (!user) {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
             }
-
+            
             if (!accessToken && !refreshToken) {
                 
-                const newAccessToken = await authService.createAccessToken(user)
+                const newAccessToken =  await authService.createAccessToken(user)
                 const newRefreshToken = await authService.createRefreshToken(user)
 
 
                 console.log('TOKEN USER SERVICE ' + newAccessToken);
                 console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
                 
-                
+                console.log(JSON.stringify(user) + "  C'EST LE USER DANS USER SERVICE !!!!!!")
 
                 return { user, newAccessToken, newRefreshToken }
             }
+
+                console.log(user + "  C'EST LE USER DANS USER SERVICE !!!!!!");
 
             return user
 
@@ -76,10 +79,14 @@ const userService = {
             
         } finally {
 
-            await ad.unbind()
-        }
-        
-        },
+            if (ad) {
+            try {
+                await ad.unbind();
+            } catch (unbindErr) {
+                console.warn("Erreur pendant le unbind LDAP :", unbindErr.message);
+            }
+        }}
+    },
 
         getUsers: async() => {
 

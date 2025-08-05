@@ -5,7 +5,6 @@
 const authService = require('../SERVICES/auth.service')
 const userService = require('../SERVICES/user.service')
 const jwt = require('jsonwebtoken');
-const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
 
 const userController = {
 
@@ -23,13 +22,13 @@ const userController = {
 
             const accessToken = req.cookies.accessToken
             const refreshToken = req.cookies.refreshToken
-
-            //Construction du DN complet à partir du username
-            //const userDN = `uid=${username},ou${}`
+            console.log("ON ME VOIT 1 ?????");
+            
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
             const successLogin = await userService.login(username, email, password, accessToken, refreshToken)
-
+            console.log("EST CE QU'ON ME VOIT 2 !!!!????");
+            
 
             //Si aucun utilisateur n'est trouvé, retourne une erreur
             if (!successLogin) {
@@ -47,14 +46,14 @@ const userController = {
 
             //renvoie du token d'accès
             res.cookie('accessToken', successLogin.newAccessToken) //FAIRE UNE MEILLEURE SECURITE AVEC LES OPTIONS
-
+            
             //renvoie le token d'actualisation
             res.cookie('refreshToken', successLogin.newRefreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
 
             return res.status(200).json({ message: `${username} authentifié` })
 
-        } catch (err) {
-            console.error("Erreur LDAP : " + err);
+        } catch (err) {            
+            console.error("Erreur LDAP DANS LE USER CONTROLLER LOGIN : " + err);
             return res.status(500).json({ message : "Erreur login LDAP" })
         }
 

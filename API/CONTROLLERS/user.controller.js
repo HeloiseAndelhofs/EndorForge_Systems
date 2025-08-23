@@ -26,7 +26,7 @@ const userController = {
             
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
-            const successLogin = await userService.login(username, email, password, accessToken, refreshToken)
+            const successLogin = await userService.login(email, password, accessToken, refreshToken)
             console.log("EST CE QU'ON ME VOIT 2 !!!!????");
             
 
@@ -133,7 +133,7 @@ const userController = {
             const usersList = await userService.getUsers()
 
             if (usersList) {
-                res.status(200).json(usersList)
+               return res.status(200).json(usersList)
             } else {
                 return res.status(404).json({ message: 'Impossible de récupérer les utilisateurs' })
             }

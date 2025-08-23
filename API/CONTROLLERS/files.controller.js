@@ -142,7 +142,15 @@ const filesController = {
 
   getFiles: async (req, res) => {
     try {
-      // à implémenter plus tard
+      
+      const filesList = await filesService.getFiles()
+
+      if (filesList) {
+        return res.status(200).json(filesList)
+      } else {
+        return res.status(404).json({message : "Une erreur est survenue lors de la récupération des fichiers, rien n'a été récupéré. (CONTROLLER)"})
+      }
+
     } catch (err) {
       console.error("Erreur serveur lors de la récupération des fichiers : " + err);
       return res.status(500).json({ message: "Erreur serveur lors de la récupération des fichiers" });
@@ -151,7 +159,20 @@ const filesController = {
 
   downloadFiles: async (req, res) => {
     try {
-      // à implémenter plus tard
+      
+      const fileID = req.params.id
+
+      const file = await filesService.getFileByID(fileID)
+      if (!file) {
+        return res.status(404).json({ message : "Aucun fichier trouvé, erreur lors de la récupération du fichier à télécharger. (CONTROLLER)" })
+      }
+
+      //LOGIQUE POUR VERIFIER LES DROITS D'ACCES TELECHARGEMENT
+
+      const absolutePath = path.join(__dirname, "../FILES", file.file_path)
+
+      return res.download(absolutePath, file.file_name) //param 2 = nom du fichier qui sera donné au navigateur
+
     } catch (err) {
       console.error("Erreur serveur lors du téléchargement des fichiers : " + err);
       return res.status(500).json({ message: "Erreur lors de la récupération des fichiers" });

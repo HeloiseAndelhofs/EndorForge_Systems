@@ -12,9 +12,9 @@ const auth = async (req, res, next) => {
     }
 
     try {
-        console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE TOUS LES TOKENS SONT BONS");
-
+        
         const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+        console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE TOUS LES TOKENS SONT BONS");
 
         if (decoded) {
             req.payload = decoded;

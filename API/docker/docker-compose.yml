@@ -1,3 +1,5 @@
+# Rappel : ouvrir docker desktop et lancer le container avant de lancer le service
+
 services:
   clamav:
     image: clamav/clamav:latest

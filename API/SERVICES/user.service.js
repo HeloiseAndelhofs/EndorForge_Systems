@@ -14,7 +14,7 @@ let ad;
 
 const userService = {
     
-    login: async (username, email, password, accessToken, refreshToken) => {
+    login: async (email, password, accessToken, refreshToken) => {
         
         console.log('SALUT!!!!!');
         try {
@@ -29,7 +29,7 @@ const userService = {
                 filter: `(mail=${email})`,
                 attributes: ['dn', 'cn'],
             });
-
+            
             console.log(searchEntries[0].dn);
             
 

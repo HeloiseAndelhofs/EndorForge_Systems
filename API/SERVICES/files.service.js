@@ -26,6 +26,53 @@ const filesService = {
             console.error("Erreur serveur lors de l'ajout du fichier dans la DB : " + err);
             throw new Error("Erreur serveur lors de l'ajout du fichier dans la DB")
         }
+    },
+
+    getFiles: async () => {
+
+        try {
+            
+            await sql.connect(sqlConfig)
+            const request = new sql.Request()
+
+            const result = await request
+                    .query(`SELECT * FROM files`)
+
+            if (result.recordset <= 0) {
+                throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")
+            }
+
+            return result.recordset
+
+        } catch (err) {
+            console.error(err);
+            throw new Error(err.message)
+        }
+
+    },
+
+    getFileByID: async (id) => {
+
+        try {
+            
+            await sql.connect(sqlConfig)
+            const request = new sql.Request()
+
+            const result = await request
+                    .input('fileID', sql.Int, id)
+                    .query(`SELECT * FROM FILES WHERE file_id = @fileID`)
+
+            if (result.recordset[0] <= 0) {
+                throw new Error("Erreur lors de la récupération du fichier à télécharger. (SERVICE)")
+            }
+
+            return result.recordset[0]
+
+        } catch (err) {
+            console.error(err);
+            throw new Error(err.message)
+        }
+
     }
 
 }

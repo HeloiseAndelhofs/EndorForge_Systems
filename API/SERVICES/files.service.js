@@ -37,7 +37,7 @@ const filesService = {
 
             const result = await request
                     .query(`SELECT * FROM files`)
-
+ 
             if (result.recordset <= 0) {
                 throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")
             }

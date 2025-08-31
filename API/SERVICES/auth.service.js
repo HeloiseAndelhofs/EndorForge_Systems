@@ -4,6 +4,9 @@
 
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET, JWT_REFRESH_SECRET } = process.env;
+const sql = require('mssql')
+const sqlConfig = require('../configs/sql.config')
+
 
 const authService = {
 
@@ -22,9 +25,15 @@ const authService = {
 
     },
 
-    createRefreshToken: (user) => {
+    createRefreshToken: async (user) => {
         
         const refreshToken = jwt.sign({ id: user.user_id, email: user.user_email }, JWT_REFRESH_SECRET, { expiresIn: '14d' });
+
+        await sql.connect(sqlConfig)
+        await new sql.Request()
+                .input("userID", sql.Int, user.user_id)
+                .input("token", sql.NVarChar, refreshToken)
+                .query(`INSERT INTO USERS (user_refresh_token) WHERE user_id = @userID VALUES (@token)`)
 
         return refreshToken
     }

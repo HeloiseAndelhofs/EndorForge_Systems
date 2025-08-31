@@ -4,6 +4,7 @@
 
 const authService = require('../SERVICES/auth.service')
 const userService = require('../SERVICES/user.service')
+const refreshTokenService = require('../SERVICES/refreshToken.service')
 const jwt = require('jsonwebtoken');
 
 const userController = {

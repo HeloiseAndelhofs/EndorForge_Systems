@@ -37,6 +37,10 @@ const auth = async (req, res, next) => {
                 
                 const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
                 console.log(decodedRefresh);
+
+                if (!decodedRefresh) {
+                    return res.status(401).json({ message: "Refresh Token expiré ou non valable." })
+                }
                 
                 const user = await utilityFunctions.getUser(decodedRefresh.email);
                 

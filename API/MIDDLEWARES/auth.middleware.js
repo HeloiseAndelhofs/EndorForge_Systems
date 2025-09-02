@@ -1,6 +1,7 @@
 // MIDDLEWARES/auth.js
 const jwt = require('jsonwebtoken');
-const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
+const authService = require('../SERVICES/auth.service')
+const refreshTokenService = require('../SERVICES/refreshToken.service');
 
 const auth = async (req, res, next) => {
 
@@ -23,6 +24,12 @@ const auth = async (req, res, next) => {
 
     } catch (err) {
 
+        if (err.name !== "TokenExpiredError") {
+            console.error("Erreur JWT :", err);
+            return res.status(401).json({message : "Token invalide."})
+        }
+
+        //Access token expiré ==> on tente un refresh
         if (err.name === "TokenExpiredError") {
             console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE ERR TOKEN EXPIRED");
             
@@ -34,7 +41,13 @@ const auth = async (req, res, next) => {
 
             try {
                 console.log("MIDDLEWARE, CREATION D'UN NOUVEAU ACCESS TOKEN");
-                
+
+                const userFromDB = await refreshTokenService.find(refreshToken)
+
+                if (!userFromDB) {
+                    return res.status(404).json({ message: "Refresh token invalide." })
+                }
+
                 const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
                 console.log(decodedRefresh);
 
@@ -42,14 +55,8 @@ const auth = async (req, res, next) => {
                     return res.status(401).json({ message: "Refresh Token expiré ou non valable." })
                 }
                 
-                const user = await utilityFunctions.getUser(decodedRefresh.email);
-                
-                if (!user) {
-                    return res.status(403).json({ message: "Utilisateur non trouvé." });
-                }
-                
                 // Nouveau access token
-                const newAccessToken = utilityFunctions.newToken(user);
+                const newAccessToken = authService.createAccessToken(userFromDB)
 
                 res.cookie("accessToken", newAccessToken);
 
@@ -61,9 +68,6 @@ const auth = async (req, res, next) => {
                 return res.status(403).json({ message: "Refresh token invalide ou expiré." });
             }
         }
-
-        console.error("Erreur JWT :", err);
-        return res.status(403).json({ message: "Token invalide." });
     }
 };
 

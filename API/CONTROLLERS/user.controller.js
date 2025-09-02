@@ -36,13 +36,17 @@ const userController = {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
             }
 
-            if (accessToken && refreshToken) {
-                return res.redirect('/endor/yourProfile')
-            }
+            //FAIRE LA REDIRECTION DANS LE FRONT
+            // if (accessToken && refreshToken) {
+            //     return res.redirect('/endor/yourProfile')
+            // }
+
+            const newRefreshToken = successLogin.newRefreshToken
 
             console.log("ACCESS TOKEN CONTROLLER : " + successLogin.newAccessToken);
             console.log("REFRESH TOKEN CONTROLLER : " + successLogin.newRefreshToken);
             
+            await refreshTokenService.save(successLogin.id, newRefreshToken)
             
 
             //renvoie du token d'accès
@@ -60,12 +64,13 @@ const userController = {
 
     },
 
-    logout: (req, res) => {
+    logout: async (req, res) => {
 
         try {
             
             res.clearCookie('accessToken');
             res.clearCookie('refreshToken')
+            await refreshTokenService.revoke(req.cookies.refreshToken)
             return res.status(200).json({ message: 'Déconnexion réussie.' });
 
         } catch (err) {

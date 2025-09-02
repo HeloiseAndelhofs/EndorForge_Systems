@@ -6,6 +6,7 @@ const sql = require('mssql');
 const sqlConfig = require('../configs/sql.config.js');
 const { Client } = require('ldapts')
 const adConfig = require('../configs/activeDirectory.config');
+const jwt = require('jsonwebtoken')
 
 const utilityFunctions = require('./utilityFuncUsers.service.js');
 const authService = require('./auth.service.js');
@@ -48,29 +49,25 @@ const userService = {
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)
-            
+    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOH");
+                
 
             if (!user) {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
             }
             
-            if (!accessToken && !refreshToken) {
+            console.log("AAAAAAAAAAAAAAAAAAAAAH");
                 
-                const newAccessToken =  await authService.createAccessToken(user)
-                const newRefreshToken = await authService.createRefreshToken(user)
+            const newAccessToken = await authService.createAccessToken(user)
+            const newRefreshToken = await authService.createRefreshToken(user)
 
+            console.log("EZADFHUIAZPFHDNAPUIYZGDERNHCXPEYHAZUCB YAZUI");
+            
 
-                console.log('TOKEN USER SERVICE ' + newAccessToken);
-                console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
-                
-                console.log(JSON.stringify(user) + "  C'EST LE USER DANS USER SERVICE !!!!!!")
+            console.log('TOKEN USER SERVICE ' + newAccessToken);
+            console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
 
-                return { user, newAccessToken, newRefreshToken }
-            }
-
-                console.log(user + "  C'EST LE USER DANS USER SERVICE !!!!!!");
-
-            return user
+            return { user, newAccessToken, newRefreshToken }
 
         } catch (err) {
 

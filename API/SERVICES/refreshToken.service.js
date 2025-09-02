@@ -13,7 +13,7 @@ const refreshToken = {
                     .input("token", sql.NVarChar, token)
                     .query(`
                             UPDATE USERS
-                            SET user_refresh_token = @token, user_updated£_at = GETDATE()
+                            SET user_refresh_token = @token, user_updatedAt = GETDATE()
                             WHERE user_id = @userID
                         `)
 

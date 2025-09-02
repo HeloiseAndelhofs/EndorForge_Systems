@@ -10,8 +10,11 @@ const sqlConfig = require('../configs/sql.config')
 
 const authService = {
 
-    createAccessToken: (user) => {
-
+    createAccessToken: async (user) => {
+        console.log("AUTH SERVICE HELLO");
+        
+        console.log(user);
+        
         const accessToken =  jwt.sign({
             id: user.user_id,
             role: user.user_role,
@@ -33,7 +36,9 @@ const authService = {
         await new sql.Request()
                 .input("userID", sql.Int, user.user_id)
                 .input("token", sql.NVarChar, refreshToken)
-                .query(`INSERT INTO USERS (user_refresh_token) WHERE user_id = @userID VALUES (@token)`)
+                .query(`UPDATE USERS 
+                        SET user_refresh_token = @token, user_updatedAt = GETDATE()
+                        WHERE user_id = @userID `)
 
         return refreshToken
     }

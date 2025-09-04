@@ -1,5 +1,6 @@
 const sqlConfig = require('../configs/sql.config')
 const sql = require('mssql')
+const utilitFunc = require('../SERVICES/utilityFuncUsers.service')
 
 const filesService = {
 
@@ -28,15 +29,26 @@ const filesService = {
         }
     },
 
-    getFiles: async () => {
+    getFiles: async (user) => {
 
         try {
             
             await sql.connect(sqlConfig)
             const request = new sql.Request()
 
+            const teamId = await utilitFunc.getTeamId(user.team_ou)
+
             const result = await request
-                    .query(`SELECT * FROM files`)
+                .input("role", sql.VarChar, user.role)
+                .input('teamId', sql.Int, teamId)
+                .input('userId', sql.Int, user.id)
+                    .query(`SELECT * FROM files 
+                            WHERE
+                                (@role = 'Admin)
+                                OR (file_visibility = 'Public) 
+                                OR (file_visibility = 'Team' AND FK_team_id = @teamId)
+                                OR (file_visibility = 'Private' AND FK_user_id = @userId)
+                                `)
  
             if (result.recordset <= 0) {
                 throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")

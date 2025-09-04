@@ -49,19 +49,14 @@ const userService = {
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)
-    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOH");
                 
 
             if (!user) {
                 throw new Error(`Aucun utilisateur avec l'email ${email} n'a été trouvé dans la base de données`)
             }
-            
-            console.log("AAAAAAAAAAAAAAAAAAAAAH");
-                
+                            
             const newAccessToken = await authService.createAccessToken(user)
             const newRefreshToken = await authService.createRefreshToken(user)
-
-            console.log("EZADFHUIAZPFHDNAPUIYZGDERNHCXPEYHAZUCB YAZUI");
             
 
             console.log('TOKEN USER SERVICE ' + newAccessToken);

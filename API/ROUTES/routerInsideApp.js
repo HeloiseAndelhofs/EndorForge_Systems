@@ -5,6 +5,7 @@ const router = require('express').Router()
 const auth = require('../MIDDLEWARES/auth.middleware')
 const userController = require('../CONTROLLERS/user.controller')
 const filesController = require('../CONTROLLERS/files.controller')
+const authorize = require('../MIDDLEWARES/authorize.middleware')
 
 router.get('/users', auth, userController.getUsers)
 router.get('/yourProfile', auth, userController.getYourProfile)

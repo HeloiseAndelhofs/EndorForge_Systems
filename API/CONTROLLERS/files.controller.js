@@ -5,6 +5,7 @@ const fs = require('fs').promises;
 const FileType = require('file-type');
 const initClamscan = require('../configs/clamscan.config')
 const filesService = require('../SERVICES/files.service');
+const accessService = require("../SERVICES/access.service")
 //const clamscan = require('../configs/clamscan.config');
 
 let tmpPath = null;
@@ -143,17 +144,26 @@ const filesController = {
   getFiles: async (req, res) => {
     try {
       
-      const filesList = await filesService.getFiles()
+      const user = req.payload
+      const filesList = await filesService.getFiles(user)
 
-      if (filesList) {
-        return res.status(200).json(filesList)
+      const accessibleFiles = filesList.filter(file => 
+        accessService.canAccessFile(user, file)
+      )
+
+      if (accessibleFiles) {
+        return res.status(200).json(accessibleFiles)
+
       } else {
+
         return res.status(404).json({message : "Une erreur est survenue lors de la récupération des fichiers, rien n'a été récupéré. (CONTROLLER)"})
       }
 
     } catch (err) {
+
       console.error("Erreur serveur lors de la récupération des fichiers : " + err);
       return res.status(500).json({ message: "Erreur serveur lors de la récupération des fichiers" });
+      
     }
   },
 
@@ -161,6 +171,7 @@ const filesController = {
     try {
       
       const fileID = req.params.id
+      const user = req.payload
 
       const file = await filesService.getFileByID(fileID)
       if (!file) {
@@ -168,9 +179,14 @@ const filesController = {
       }
 
       //LOGIQUE POUR VERIFIER LES DROITS D'ACCES TELECHARGEMENT
+      
+      const canDowload = accessService.canAccessFile(user, file)
+
+      if (!canDowload) {
+        return res.status(403).json({ message: "Vous n'avez pas l'autorisation de télécharger ce fichier." })
+      }
 
       const absolutePath = path.join(__dirname, "../FILES", file.file_path)
-
       return res.download(absolutePath, file.file_name) //param 2 = nom du fichier qui sera donné au navigateur
 
     } catch (err) {

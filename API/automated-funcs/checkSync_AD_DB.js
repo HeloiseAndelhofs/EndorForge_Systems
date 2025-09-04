@@ -113,7 +113,7 @@ const ad_db_func =  {
 
             const match = userAD.dn.match(/ou=([^,]+)/i);
             const ou = match ? match[1] : null;
-            const teamID = await utilityFunctions.getTeamId(ou)
+            const teamID = await utilityFunctions.getTeamIdByOU(ou)
             console.log(loginName, mail);
             console.log(userAD);
             console.log(role);

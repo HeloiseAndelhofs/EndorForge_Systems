@@ -5,7 +5,8 @@ const fs = require('fs').promises;
 const FileType = require('file-type');
 const initClamscan = require('../configs/clamscan.config')
 const filesService = require('../SERVICES/files.service');
-const accessService = require("../SERVICES/access.service")
+const accessService = require("../SERVICES/access.service");
+const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
 //const clamscan = require('../configs/clamscan.config');
 
 let tmpPath = null;
@@ -13,6 +14,8 @@ let tmpPath = null;
 const filesController = {
   uploadFile: async (req, res) => {
     try {
+
+      //PARTIE FICHIER, VERIFICATION TYPE, VIRUS, TAILLE ET AJOUT/MODIFICATION NOM
 
       //Vérifie si un fichier a bien été posté
       if (!req.files || Object.keys(req.files).length === 0) {
@@ -114,13 +117,22 @@ const filesController = {
       await fs.rename(tmpPath, finalPath);
       tmpPath = null //Plus besoin de supprimer (déplacer correcetment dans dossier permanent)
 
+      //FIN DE LA PARTIE FICHIERS
+
+      const { description, visibility, roleRequired, teamName } = req.body
+      const validatedInput = await accessService.validateFileAccessOptions(decoded, visibility, roleRequired, teamName)
+
       // Enregistre en base de données
       await filesService.putFileDB(
         file.name,
         relativePath,
         decoded.id,
+        validatedInput.visibility,
+        validatedInput.roleRequired,
         file.mimetype,
-        file.size
+        file.size,
+        validatedInput.teamId,
+        description
       );
 
       return res.send("Fichier uploadé avec succès.");
@@ -146,9 +158,10 @@ const filesController = {
       
       const user = req.payload
       const filesList = await filesService.getFiles(user)
+      const userTeam = await utilityFunctions.getTeamIdByName(user.team)
 
       const accessibleFiles = filesList.filter(file => 
-        accessService.canAccessFile(user, file)
+        accessService.canAccessFile(user, file, userTeam)
       )
 
       if (accessibleFiles) {
@@ -163,7 +176,7 @@ const filesController = {
 
       console.error("Erreur serveur lors de la récupération des fichiers : " + err);
       return res.status(500).json({ message: "Erreur serveur lors de la récupération des fichiers" });
-      
+
     }
   },
 

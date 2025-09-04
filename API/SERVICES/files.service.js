@@ -4,7 +4,7 @@ const utilitFunc = require('../SERVICES/utilityFuncUsers.service')
 
 const filesService = {
 
-    putFileDB: async(filename, file_path, userID, file_type, file_size) => {
+    putFileDB: async(filename, file_path, userID, visibility, roleRequired, file_type, file_size, teamId, description) => {
         try {
             
             await sql.connect(sqlConfig);
@@ -13,12 +13,15 @@ const filesService = {
                 .input('filename', sql.VarChar, filename)
                 .input('file_path', sql.VarChar, file_path)
                 .input('userId', sql.Int, userID)
-                //.input('uploadedAt', sql.DateTime, new Date())
+                .input('visibility', sql.VarChar, visibility)
+                .input('roleRequired', sql.VarChar, roleRequired)
                 .input('file_type', sql.VarChar, file_type)
                 .input('file_size', sql.Int, file_size)
+                .input('teamId', sql.Int, teamId)
+                .input('description', sql.VarChar, description)
                 .query(`
-                    INSERT INTO FILES (file_name, file_path, FK_user_id, file_type, file_size)
-                    VALUES (@filename, @file_path, @userId,  @file_type, @file_size)
+                    INSERT INTO FILES (file_name, file_path, FK_user_id, file_uploadedAt, file_visibility, file_roleRequired, file_type, file_size, FK_team_id, file_description)
+                    VALUES (@filename, @file_path, @userId, GETDATE(), @visibility, @roleRequired, @file_type, @file_size, @teamId, @description)
                 `)
 
             return
@@ -36,7 +39,7 @@ const filesService = {
             await sql.connect(sqlConfig)
             const request = new sql.Request()
 
-            const teamId = await utilitFunc.getTeamId(user.team_ou)
+            const teamId = await utilitFunc.getTeamIdByOU(user.team_ou)
 
             const result = await request
                 .input("role", sql.VarChar, user.role)

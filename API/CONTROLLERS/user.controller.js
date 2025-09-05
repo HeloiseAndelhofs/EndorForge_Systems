@@ -80,29 +80,29 @@ const userController = {
 
     },
 
-    refreshToken: async(req, res) => {
+    // refreshToken: async(req, res) => {
 
-         try {
+    //      try {
 
-            const refreshToken = req.cookies.refreshToken;
+    //         const refreshToken = req.cookies.refreshToken;
 
-            if (!refreshToken) return res.status(401).json({ message: "Aucun token de rafraîchissement." });
+    //         if (!refreshToken) return res.status(401).json({ message: "Aucun token de rafraîchissement." });
 
-            const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-            const user = await userService.getUserById(decoded.id);
+    //         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    //         const user = await userService.getUserById(decoded.id);
 
-            if (!user) return res.status(403).json({ message: "Utilisateur introuvable." });
+    //         if (!user) return res.status(403).json({ message: "Utilisateur introuvable." });
 
-            const newAccessToken = authService.createAccessToken(user);
+    //         const newAccessToken = authService.createAccessToken(user);
             
-            res.cookie('accessToken', newAccessToken);
-            return res.status(200).json({ message: "Token actualisé." });
+    //         res.cookie('accessToken', newAccessToken);
+    //         return res.status(200).json({ message: "Token actualisé." });
 
-        } catch (err) {
-            return res.status(403).json({ message: "Refresh token invalide ou expiré." });
-        }
+    //     } catch (err) {
+    //         return res.status(403).json({ message: "Refresh token invalide ou expiré." });
+    //     }
 
-    },
+    // },
 
     getYourProfile: async(req, res) => {
 

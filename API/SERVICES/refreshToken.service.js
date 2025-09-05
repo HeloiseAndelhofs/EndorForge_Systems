@@ -29,18 +29,18 @@ const refreshToken = {
         try {
             
             await sql.connect(sqlConfig)
-            const result = new sql.Request()
-            await result
+            const result = await new sql.Request()
                 .input("token", sql.NVarChar, token)
                 .query(`
                     SELECT * FROM USERS
                     WHERE user_refresh_token = @token
                     `)
 
-            if (!result.recordset[0]) {
+
+            if (result.recordset.length <= 0) {
                 throw new Error("ERREUR LORS DE LA RÉCUPERATION DU USER AVEC LE TOKEN DANS LE REFRESH TOKEN SERVICE.")
             }
-
+            
             return result.recordset[0]
 
         } catch (err) {

@@ -38,8 +38,9 @@ const filesService = {
             
             await sql.connect(sqlConfig)
             const request = new sql.Request()
-
-            const teamId = await utilitFunc.getTeamIdByOU(user.team_ou)
+            console.log(user.ou);
+            
+            const teamId = await utilitFunc.getTeamIdByOU(user.ou)
 
             const result = await request
                 .input("role", sql.VarChar, user.role)
@@ -47,11 +48,10 @@ const filesService = {
                 .input('userId', sql.Int, user.id)
                     .query(`SELECT * FROM files 
                             WHERE
-                                (@role = 'Admin)
-                                OR (file_visibility = 'Public) 
+                                (@role = 'Admin')
+                                OR (file_visibility = 'Public') 
                                 OR (file_visibility = 'Team' AND FK_team_id = @teamId)
-                                OR (file_visibility = 'Private' AND FK_user_id = @userId)
-                                `)
+                                OR (file_visibility = 'Private' AND FK_user_id = @userId)`)
  
             if (result.recordset <= 0) {
                 throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")

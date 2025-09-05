@@ -24,6 +24,8 @@ const authService = {
             username: `uid=${user.user_name},ou=${user.team_ou},dc=endor-forge,dc=local`
         }, JWT_SECRET, { expiresIn: '15m' });
 
+        console.log(accessToken);
+        
         return accessToken
 
     },

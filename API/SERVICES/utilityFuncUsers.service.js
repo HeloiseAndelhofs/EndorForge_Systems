@@ -37,7 +37,8 @@ const utilityFunctions = {
 
     getTeamIdByOU: async (ou) => {
         try {
-
+            console.log(ou);
+            
             await sql.connect(sqlConfig)
 
             const teamID = await new sql.Request()

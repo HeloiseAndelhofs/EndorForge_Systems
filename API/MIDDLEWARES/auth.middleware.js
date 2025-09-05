@@ -58,6 +58,7 @@ const auth = async (req, res, next) => {
                 // Nouveau access token
                 const newAccessToken = authService.createAccessToken(userFromDB)
 
+                res.clearCookie('accessToken');
                 res.cookie("accessToken", newAccessToken);
 
                 req.payload = jwt.decode(newAccessToken);

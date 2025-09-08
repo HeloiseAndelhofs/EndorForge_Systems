@@ -1,0 +1,45 @@
+/* profile.css */
+
+.profil-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background: #0f172a; /* même fond sombre que login */
+  padding: 2rem;
+}
+
+.profil-user {
+  background: #1e293b; /* carte sombre */
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+  text-align: center;
+  color: #38bdf8; /* bleu clair comme le titre du login */
+  margin-bottom: 2rem;
+}
+
+.profil-user h2 {
+  margin: 0.8rem 0;
+  font-size: 1.1rem;
+  color: #f8fafc; /* texte clair */
+  font-weight: normal;
+}
+
+.profil-user h2 span {
+  font-weight: bold;
+  color: #38bdf8; /* valeur mise en avant */
+}
+
+.error {
+  color: #f87171; /* rouge clair pour erreurs */
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}

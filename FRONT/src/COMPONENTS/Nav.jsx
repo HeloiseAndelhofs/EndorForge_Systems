@@ -12,8 +12,8 @@ const Nav = () => {
                 </Link>
                 <ul>
                     <li>
-                        <Link to="/profil">
-                            <h2>Profil</h2>
+                        <Link to="/profile">
+                            <h2>Profile</h2>
                         </Link>
                     </li>
                     <li>

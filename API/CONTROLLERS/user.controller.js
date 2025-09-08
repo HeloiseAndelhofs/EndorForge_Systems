@@ -17,7 +17,7 @@ const userController = {
             const { username, email, password } = req.body
 
             //Vérification que les données demandées sont présentes
-            if (!username || !password || !email) {
+            if (!password || !email) {
                 return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
@@ -33,14 +33,8 @@ const userController = {
 
             //Si aucun utilisateur n'est trouvé, retourne une erreur
             if (!successLogin) {
-                return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le nom ${username} trouvé. ` })
+                return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le mail ${email} trouvé. ` })
             }
-
-            //FAIRE LA REDIRECTION DANS LE FRONT
-            // if (accessToken && refreshToken) {
-            //     return res.redirect('/endor/yourProfile')
-            // }
-
             const newRefreshToken = successLogin.newRefreshToken
 
             console.log("ACCESS TOKEN CONTROLLER : " + successLogin.newAccessToken);
@@ -55,7 +49,7 @@ const userController = {
             //renvoie le token d'actualisation
             res.cookie('refreshToken', successLogin.newRefreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
 
-            return res.status(200).json({ message: `${username} authentifié` })
+            return res.status(200).json({ message: `${email} authentifié` })
 
         } catch (err) {            
             console.error("Erreur LDAP DANS LE USER CONTROLLER LOGIN : " + err);

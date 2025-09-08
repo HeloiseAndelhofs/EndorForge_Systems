@@ -1,11 +1,12 @@
 import "../CSS/landing.css"
+import Nav from "../COMPONENTS/Nav"
 
 
 const Landing = () => {
 
     return (
         <>
-        
+            <Nav /> 
             <main>
                 <h1>Nova par Endor Forge Systems</h1>
                 <h2>La plateforme interne sécurisée pour partager vos fichiers, collaborer en équipe et gagner du temps</h2>

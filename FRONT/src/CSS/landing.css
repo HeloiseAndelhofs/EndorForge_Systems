@@ -1,63 +1,51 @@
-/* === Global style de la page Landing === */
+/* LANDING PAGE */
 main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 4rem 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 0 2rem;
   text-align: center;
-  color: #222;
 }
 
-/* Titre principal */
 main h1 {
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #1a237e; /* bleu foncé élégant */
+  color: #38bdf8;
 }
 
-/* Sous-titre */
 main h2 {
   font-size: 1.5rem;
-  font-weight: 400;
   margin-bottom: 2rem;
-  color: #444;
+  font-weight: 400;
+  color: #e2e8f0;
 }
 
-/* Paragraphe de présentation */
 main p {
   font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 3rem;
-  color: #555;
+  margin-bottom: 2rem;
+  color: #cbd5e1;
 }
 
-/* Sous-titres */
 main h3 {
-  font-size: 1.3rem;
   margin-top: 2rem;
   margin-bottom: 1rem;
-  color: #1a237e;
+  color: #facc15;
 }
 
-/* Liste des avantages */
 main ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  margin-bottom: 2rem;
 }
 
 main ul li {
+  color: #cbd5e1;
   font-size: 1.1rem;
-  padding: 0.5rem 0;
-  position: relative;
-  color: #333;
+  margin: 0.5rem 0;
+  background: #1e293b;
+  padding: 0.8rem;
+  border-radius: 8px;
+  transition: background 0.2s;
 }
 
-/* Petite puce personnalisée */
-main ul li::before {
-  content: "✔";
-  color: #4caf50; /* vert succès */
-  font-weight: bold;
-  margin-right: 0.5rem;
+main ul li:hover {
+  background: #334155;
 }

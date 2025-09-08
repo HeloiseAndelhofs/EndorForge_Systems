@@ -1,0 +1,49 @@
+/* RESET SIMPLE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #0f172a; /* bleu nuit */
+  color: #f8fafc; /* texte clair */
+  line-height: 1.6;
+}
+
+/* NAVIGATION */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+nav h2 {
+  font-size: 1.2rem;
+  color: #38bdf8; /* bleu clair */
+  transition: color 0.2s;
+}
+
+nav h2:hover {
+  color: #facc15; /* jaune */
+}
+
+nav ul {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+nav ul li {
+  transition: transform 0.2s;
+}
+
+nav ul li:hover {
+  transform: scale(1.05);
+}

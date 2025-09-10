@@ -182,25 +182,34 @@ const filesController = {
 
   downloadFiles: async (req, res) => {
     try {
-      
+
       const fileID = req.params.id
       const user = req.payload
-
+      
       const file = await filesService.getFileByID(fileID)
       if (!file) {
         return res.status(404).json({ message : "Aucun fichier trouvé, erreur lors de la récupération du fichier à télécharger. (CONTROLLER)" })
       }
-
-      //LOGIQUE POUR VERIFIER LES DROITS D'ACCES TELECHARGEMENT
       
+      //LOGIQUE POUR VERIFIER LES DROITS D'ACCES TELECHARGEMENT
       const canDowload = accessService.canAccessFile(user, file)
-
+      
       if (!canDowload) {
         return res.status(403).json({ message: "Vous n'avez pas l'autorisation de télécharger ce fichier." })
       }
 
       const absolutePath = path.join(__dirname, "../FILES", file.file_path)
-      return res.download(absolutePath, file.file_name) //param 2 = nom du fichier qui sera donné au navigateur
+      return res.download(absolutePath, file.file_name, (err) => {
+        if (err) {
+          console.error("Erreur download : " + err);
+          
+          if (!res.headersSent) {
+            return res.status(500).json({
+              message: "Erreur lors du téléchargement du fichier"
+            })
+          }
+        }
+      }) //param 2 = nom du fichier qui sera donné au navigateur
 
     } catch (err) {
       console.error("Erreur serveur lors du téléchargement des fichiers : " + err);

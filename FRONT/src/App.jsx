@@ -4,6 +4,8 @@ import Landing from "./PAGES/landing"
 import Login from "./PAGES/login"
 import Home from "./PAGES/CONNECTED/home"
 import Profile from "./PAGES/CONNECTED/profile"
+import FilesList from "./PAGES/CONNECTED/files"
+
 import Logout from "./COMPONENTS/Logout"
 
 import './App.css'
@@ -19,6 +21,7 @@ function App() {
       <Route path="/nova" element={<Home />}/>,
       <Route path="/profile" element={<Profile />}/>
       <Route path="/logout" element={<Logout />}/>
+      <Route path="/files" element={<FilesList />} />
 
     </Routes>
 

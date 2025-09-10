@@ -20,6 +20,7 @@
     "express-fileupload": "^1.5.2",
     "express-validator": "^7.2.1",
     "file-type": "^21.0.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "ldapts": "^8.0.8",
     "mssql": "^11.0.1",

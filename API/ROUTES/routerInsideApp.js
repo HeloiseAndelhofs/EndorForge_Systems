@@ -18,7 +18,7 @@ router.get('/logout', userController.logout)
 
 router.post('/postFile', auth, filesController.uploadFile)
 router.get('/getFiles', auth, filesController.getFiles)
-router.get('/download/:id', auth, filesController.downloadFiles)
+router.get('/files/download/:id', auth, filesController.downloadFiles)
 
 
 

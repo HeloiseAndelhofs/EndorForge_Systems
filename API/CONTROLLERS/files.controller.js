@@ -15,6 +15,9 @@ const filesController = {
   uploadFile: async (req, res) => {
     try {
 
+      console.log(req.files);
+      
+
       //PARTIE FICHIER, VERIFICATION TYPE, VIRUS, TAILLE ET AJOUT/MODIFICATION NOM
 
       //Vérifie si un fichier a bien été posté
@@ -23,9 +26,9 @@ const filesController = {
       }
 
       const file = req.files.myFile;
-      console.log(req.files);
+      //console.log(req.files);
       
-      console.log(file);
+      //console.log(file);
       
 
       // Analyse le type MIME réel à partir du buffer
@@ -34,7 +37,7 @@ const filesController = {
         return res.status(400).json({ message: "Type de fichier non détecté." });
       }
 
-      console.log(detectedType);
+      //console.log(detectedType);
       
 
       const extension = path.extname(file.name).toLowerCase(); // ex. ".jpg"
@@ -118,8 +121,11 @@ const filesController = {
       tmpPath = null //Plus besoin de supprimer (déplacer correcetment dans dossier permanent)
 
       //FIN DE LA PARTIE FICHIERS
-
+      console.log(req.body);
+      
       const { description, visibility, roleRequired, teamName } = req.body
+      console.log(visibility);
+      
       const validatedInput = await accessService.validateFileAccessOptions(decoded, visibility, roleRequired, teamName)
 
       // Enregistre en base de données

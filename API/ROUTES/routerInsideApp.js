@@ -16,8 +16,8 @@ router.get('/logout', userController.logout)
 // api/endor/user
 // api/endor/files
 
-router.post('/postFile', auth, filesController.uploadFile)
-router.get('/getFiles', auth, filesController.getFiles)
+router.post('/files/postFile', auth, filesController.uploadFile)
+router.get('/files', auth, filesController.getFiles)
 router.get('/files/download/:id', auth, filesController.downloadFiles)
 
 

@@ -1,0 +1,62 @@
+/* Conteneur principal */
+.files-container, .upload-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+/* Titres */
+.files-container h1, .upload-container h1 {
+  color: #38bdf8;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* TABLEAU DES FICHIERS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+thead {
+  background: #0f172a;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+thead th {
+  padding: 1rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+tbody td {
+  padding: 0.8rem 1rem;
+  border-top: 1px solid #334155;
+}
+
+tbody tr:hover {
+  background: #334155;
+  transition: background 0.2s ease;
+}
+
+/* Liens de téléchargement */
+td a {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  background: #38bdf8;
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+td a:hover {
+  background: #0ea5e9;
+}

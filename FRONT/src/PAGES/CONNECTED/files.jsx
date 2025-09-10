@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios"
 import Nav from "../../COMPONENTS/Nav"
+import "../../CSS/CONNECTED/files.css"
 
 const FilesList = () => {
 
@@ -10,7 +11,7 @@ const FilesList = () => {
     useEffect(() => {
         const fetchList = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/endor/getFiles", {
+                const res = await axios.get("http://localhost:8000/api/endor/files", {
                     withCredentials: true
                 })
             

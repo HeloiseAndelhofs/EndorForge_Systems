@@ -19,6 +19,8 @@ const Profile = () => {
         }
 
         setData(result.data)
+        //console.log(result.data);
+        
       } catch (err) {
         console.error(err)
         setError(err.response?.data?.message || err.message)
@@ -40,7 +42,9 @@ const Profile = () => {
 
       <div className="profil-container">
         {data && (
-          <div className="profil-user">
+          <>
+          <div className="card-profil">
+            <h1>Utilisateur</h1>
             <h2>Nom : {data.user_name}</h2>
             <h2>Prénom : {data.user_firstname}</h2>
             <h2>Email : {data.user_email}</h2>
@@ -48,6 +52,13 @@ const Profile = () => {
             <h2>Début du contrat : {data.user_createdAt}</h2>
             <h2>Type de contrat : {data.user_contract_type}</h2>
           </div>
+          
+          <div className="card-profil">
+            <h1>Team</h1>
+            <h2>Nom team : {data.team_name}</h2>
+            <h2>Description team : {data.team_description}</h2>
+          </div>
+          </>
         )}
       </div>
     </>

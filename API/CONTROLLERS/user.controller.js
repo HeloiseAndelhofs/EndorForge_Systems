@@ -6,6 +6,7 @@ const authService = require('../SERVICES/auth.service')
 const userService = require('../SERVICES/user.service')
 const refreshTokenService = require('../SERVICES/refreshToken.service')
 const jwt = require('jsonwebtoken');
+const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
 
 const userController = {
 
@@ -14,7 +15,7 @@ const userController = {
         try {
             
             //Récupère le username et password du body 
-            const { username, email, password } = req.body
+            const { email, password } = req.body
 
             //Vérification que les données demandées sont présentes
             if (!password || !email) {
@@ -105,11 +106,11 @@ const userController = {
             
             const token = req.cookies.accessToken
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const id = decoded.id
+            const email = decoded.email
 
             console.log(token);
             
-            const user = await userService.getUserById(id)
+            const user = await utilityFunctions.getUser(email)
 
             if (!user) {
                 return res.status(404).json({ message : "Nous n'avons pas pu trouver votre profil utilisateur." })

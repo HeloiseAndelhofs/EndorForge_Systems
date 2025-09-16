@@ -9,7 +9,6 @@ const FilesList = () => {
     const [ error, setError ] = useState("")
 
     const accessToken = sessionStorage.getItem('accessToken')
-    //const refreshToken = sessionStorage.getItem("refreshToken")
 
     const headers = {
       Authorization : `Bearer ${accessToken}`
@@ -19,8 +18,7 @@ const FilesList = () => {
         const fetchList = async () => {
             try {
                 const res = await axios.get("http://localhost:8000/api/endor/files", {
-                  headers 
-                }, {
+                    headers,
                     withCredentials: true
                 })
             

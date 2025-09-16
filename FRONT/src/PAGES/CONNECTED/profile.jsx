@@ -8,7 +8,6 @@ const Profile = () => {
   const [error, setError] = useState("")
 
     const accessToken = sessionStorage.getItem('accessToken')
-    //const refreshToken = sessionStorage.getItem("refreshToken")
 
     const headers = {
       Authorization : `Bearer ${accessToken}`
@@ -18,8 +17,9 @@ const Profile = () => {
   useEffect(() => {
     const dataProfil = async () => {
       try {
-        const result = await axios.get("http://localhost:8000/api/endor/yourProfile", { headers }, {
+        const result = await axios.get("http://localhost:8000/api/endor/yourProfile", {
           withCredentials: true,
+          headers
         })
 
         if (!result || !result.data) {

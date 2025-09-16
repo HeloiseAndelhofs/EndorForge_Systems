@@ -30,10 +30,9 @@ const Login = () => {
                 throw new Error(res.status, res.status.message)
             }
 
-            console.log(res.accessToken);
+            console.log(res.data.accessToken);
             
             sessionStorage.setItem('accessToken', res.data.accessToken)
-            sessionStorage.setItem('refreshToken', res.data.refreshToken)
 
             navigate("/nova")
 

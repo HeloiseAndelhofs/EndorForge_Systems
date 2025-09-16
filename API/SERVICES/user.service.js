@@ -15,7 +15,7 @@ let ad;
 
 const userService = {
     
-    login: async (email, password, accessToken, refreshToken) => {
+    login: async (email, password) => {
         
         try {
             console.log('SALUT!!!!!');
@@ -67,13 +67,11 @@ const userService = {
             }
                             
             const newAccessToken = await authService.createAccessToken(user)
-            const newRefreshToken = await authService.createRefreshToken(user)
             
 
             console.log('TOKEN USER SERVICE ' + newAccessToken);
-            console.log('TOKEN REFRESH USER SERVICE ' + newRefreshToken);
 
-            return { user, newAccessToken, newRefreshToken }
+            return { user, newAccessToken }
 
         } catch (err) {
 

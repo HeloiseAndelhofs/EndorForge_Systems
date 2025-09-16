@@ -22,18 +22,10 @@ const authService = {
             ou: user.team_ou,
             email: user.user_email,
             username: `uid=${user.user_name},ou=${user.team_ou},dc=endor-forge,dc=local`
-        }, JWT_SECRET, { expiresIn: '15m' });
+        }, JWT_SECRET, { expiresIn: '1d' });
 
         console.log(accessToken);
         
-        return accessToken
-
-    },
-
-    createRefreshToken: async (user) => {
-        
-        const refreshToken = jwt.sign({ id: user.user_id, email: user.user_email }, JWT_REFRESH_SECRET, { expiresIn: '14d' });
-
         await sql.connect(sqlConfig)
         await new sql.Request()
                 .input("userID", sql.Int, user.user_id)
@@ -41,8 +33,9 @@ const authService = {
                 .query(`UPDATE USERS 
                         SET user_refresh_token = @token, user_updatedAt = GETDATE()
                         WHERE user_id = @userID `)
+                        
+        return accessToken
 
-        return refreshToken
     }
 };
 

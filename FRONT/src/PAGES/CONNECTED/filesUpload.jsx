@@ -17,7 +17,7 @@ const UploadFile = () => {
     const accessToken = sessionStorage.getItem('accessToken')
     //const refreshToken = sessionStorage.getItem("refreshToken")
 
-    const headers = {
+    const headersSession = {
       Authorization : `Bearer ${accessToken}`
     }
 
@@ -43,9 +43,10 @@ const UploadFile = () => {
 
         try {
             
-            const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, { headers }, {
+            const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, {
                 withCredentials: true,
-                headers: {"Content-Type" : "multipart/form-data"}
+                headers: {"Content-Type" : "multipart/form-data"},
+                headersSession
             })
 
             if (res.status === 200) {

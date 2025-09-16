@@ -22,15 +22,11 @@ const userController = {
                 return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
-            const authHeader = req.headers['authorization']
-            const accessToken = authHeader && authHeader.split(' ')[1]
-
-            const refreshToken = req.headers['x-refresh-token']
             console.log("ON ME VOIT 1 ?????");
             
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
-            const successLogin = await userService.login(email, password, accessToken, refreshToken)
+            const successLogin = await userService.login(email, password, accessToken)
             console.log("EST CE QU'ON ME VOIT 2 !!!!????");
             
 
@@ -38,16 +34,13 @@ const userController = {
             if (!successLogin) {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le mail ${email} trouvé. ` })
             }
-            const newRefreshToken = successLogin.newRefreshToken
 
             console.log("ACCESS TOKEN CONTROLLER : " + successLogin.newAccessToken);
-            console.log("REFRESH TOKEN CONTROLLER : " + successLogin.newRefreshToken);
             
-            await refreshTokenService.save(successLogin.id, newRefreshToken)
+            //await refreshTokenService.save(successLogin.id, newRefreshToken)
             
             return res.status(200).json({ 
                 accessToken : successLogin.newAccessToken,
-                refreshToken : successLogin.newRefreshToken,
                 message: `${email} authentifié` 
             })
 
@@ -61,10 +54,9 @@ const userController = {
     logout: async (req, res) => {
 
         try {
-            
-            await refreshTokenService.revoke(sessionStorage.getItem(refreshToken))
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken')
+            const authHeader = req.headers['authorization']
+            const accessToken = authHeader && authHeader.split(' ')[1]
+            await refreshTokenService.revoke(accessToken)
             return res.status(200).json({ message: 'Déconnexion réussie.' });
 
         } catch (err) {

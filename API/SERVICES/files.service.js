@@ -53,7 +53,7 @@ const filesService = {
                                 OR (file_visibility = 'Team' AND FK_team_id = @teamId)
                                 OR (file_visibility = 'Private' AND FK_user_id = @userId)`)
  
-            if (result.recordset <= 0) {
+            if (result.recordset.length <= 0) {
                 throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")
             }
 

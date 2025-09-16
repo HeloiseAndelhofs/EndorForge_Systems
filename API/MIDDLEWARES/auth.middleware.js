@@ -8,10 +8,8 @@ const auth = async (req, res, next) => {
         const authHeader = req.headers['authorization']
         const accessToken = authHeader && authHeader.split(' ')[1]
 
-        const refreshToken = req.headers['x-refresh-token']
-
     if (!accessToken) {
-        return res.status(401).json({ message: "Aucun token détecté, veuillez vous reconnecter." });
+        return res.status(401).json({ message: "Aucun token détecté, veuillez vous connecter." });
     }
 
     try {
@@ -35,36 +33,12 @@ const auth = async (req, res, next) => {
         if (err.name === "TokenExpiredError") {
             console.log("C'EST LE MIDDLEWARE AUTH, ON EST DANS LA PARTIE ERR TOKEN EXPIRED");
             
-            if (!refreshToken) {
-                console.log("MIDDLEWARE, PAS DE TOKEN");
-                
-                return res.status(401).json({ message: "Token expiré et aucun refreshToken, veuillez vous reconnecter." });
-            }
-
             try {
                 console.log("MIDDLEWARE, CREATION D'UN NOUVEAU ACCESS TOKEN");
 
-                const userFromDB = await refreshTokenService.find(refreshToken)
-
-                if (!userFromDB) {
-                    return res.status(404).json({ message: "Refresh token invalide." })
+                if (err.name === "TokenExpiredError") {
+                    return res.status(401).json({ message : "Token expiré, veuillez vous reconnecter." })
                 }
-
-                const decodedRefresh = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-                console.log(decodedRefresh);
-
-                if (!decodedRefresh) {
-                    return res.status(401).json({ message: "Refresh Token expiré ou non valable." })
-                }
-                
-                // Nouveau access token
-                const newAccessToken = authService.createAccessToken(userFromDB)
-
-                //sessionStorage.removeItem('accessToken');
-                //sessionStorage.setItem("accessToken", newAccessToken);
-
-                req.payload = jwt.decode(newAccessToken);
-                return next();
 
             } catch (refreshErr) {
                 console.error("Erreur lors du refresh :", refreshErr);

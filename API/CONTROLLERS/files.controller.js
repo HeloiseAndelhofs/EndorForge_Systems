@@ -163,21 +163,28 @@ const filesController = {
   getFiles: async (req, res) => {
     try {
       
-      const user = req.payload
-      const filesList = await filesService.getFiles(user)
-      const userTeam = await utilityFunctions.getTeamIdByName(user.team)
+      const authHeader = req.headers['authorization']
+      const token = authHeader && authHeader.split(' ')[1]
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const filesList = await filesService.getFiles(decoded)
+      const userTeam = await utilityFunctions.getTeamIdByName(decoded.team)
 
-      const accessibleFiles = filesList.filter(file => 
-        accessService.canAccessFile(user, file, userTeam)
-      )
-
-      if (accessibleFiles) {
-        return res.status(200).json(accessibleFiles)
-
-      } else {
-
-        return res.status(404).json({message : "Une erreur est survenue lors de la récupération des fichiers, rien n'a été récupéré. (CONTROLLER)"})
+      if (filesList.length > 0) {      
+        const accessibleFiles = filesList.filter(file => 
+          accessService.canAccessFile(decoded, file, userTeam)
+        )
+  
+        if (accessibleFiles) {
+          return res.status(200).json(accessibleFiles)
+  
+        } else {
+  
+          return res.status(404).json({message : "Une erreur est survenue lors de la récupération des fichiers, rien n'a été récupéré. (CONTROLLER)"})
+        }
       }
+
+      return res.status(300).json({ message: "Aucun fichier disponible" })
+
 
     } catch (err) {
 

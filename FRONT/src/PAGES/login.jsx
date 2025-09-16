@@ -18,10 +18,10 @@ const Login = () => {
         setError("");
 
         try {
-            
+
             const res = await axios.post("http://localhost:8000/api/login", {
                 email : email,
-                password : password
+                password : password,
             }, {
                 withCredentials : true
             })
@@ -29,6 +29,11 @@ const Login = () => {
             if (res.status !== 200) {
                 throw new Error(res.status, res.status.message)
             }
+
+            console.log(res.accessToken);
+            
+            sessionStorage.setItem('accessToken', res.data.accessToken)
+            sessionStorage.setItem('refreshToken', res.data.refreshToken)
 
             navigate("/nova")
 

@@ -17,35 +17,46 @@ const userService = {
     
     login: async (email, password, accessToken, refreshToken) => {
         
-        console.log('SALUT!!!!!');
         try {
+            console.log('SALUT!!!!!');
             //Connexion à l'active directory
             ad = new Client({url : adConfig.url, tlsOptions : adConfig.tlsOptions});
+            console.log("NUMERO DEUX");
+            console.log(adConfig.bindDN, adConfig.bindCredentials);
+            
             
             await ad.bind(adConfig.bindDN, adConfig.bindCredentials)
-
+            console.log("NUMERO 3");
+            
             // Rechercher l'utilisateur (récupérer son DN)
             const { searchEntries } = await ad.search(adConfig.baseDN, {
                 scope: 'sub',
                 filter: `(mail=${email})`,
-                attributes: ['dn', 'cn'],
+                attributes: ['dn', 'cn', 'sAMAccountName'],
             });
             
-            console.log(searchEntries[0].dn);
+            console.log(searchEntries[0]);
             
 
             if (searchEntries.length === 0) {
                 throw new Error("Utilisateur introuvable");
             }
 
-            const userDN = searchEntries[0].dn;
+            console.log(searchEntries[0].sAMAccountName);
+            
 
-            if (!userDN) {
+            const userName = searchEntries[0].sAMAccountName;
+
+            console.log(userName);
+            
+
+            if (!userName) {
                 return false
             }    
 
+            const usernameConnect = `${userName.toLocaleLowerCase()}@endorforge.local`
             // 3. Rebind avec les identifiants utilisateur
-            await ad.bind(userDN, password);
+            await ad.bind(usernameConnect, password);
 
             //On appelle un service pour récupérer les infos utilisateurs
             const user = await utilityFunctions.getUser(email)

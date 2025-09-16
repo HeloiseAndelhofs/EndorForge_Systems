@@ -13,6 +13,14 @@ const UploadFile = () => {
     const [ teamName, setTeamName ] = useState("")
     const [ message, setMessage ] = useState("")
     const [ error, setError ] = useState("")
+
+    const accessToken = sessionStorage.getItem('accessToken')
+    //const refreshToken = sessionStorage.getItem("refreshToken")
+
+    const headers = {
+      Authorization : `Bearer ${accessToken}`
+    }
+
     
     const handleSubmit = async (e) => {
         
@@ -35,7 +43,7 @@ const UploadFile = () => {
 
         try {
             
-            const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, {
+            const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, { headers }, {
                 withCredentials: true,
                 headers: {"Content-Type" : "multipart/form-data"}
             })

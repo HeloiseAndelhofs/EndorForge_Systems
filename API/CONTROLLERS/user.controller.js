@@ -22,8 +22,10 @@ const userController = {
                 return res.status(400).json({ message : "Nom d'utilisateur, email et mot de passe requis" })
             }
 
-            const accessToken = req.cookies.accessToken
-            const refreshToken = req.cookies.refreshToken
+            const authHeader = req.headers['authorization']
+            const accessToken = authHeader && authHeader.split(' ')[1]
+
+            const refreshToken = req.headers['x-refresh-token']
             console.log("ON ME VOIT 1 ?????");
             
 
@@ -43,14 +45,11 @@ const userController = {
             
             await refreshTokenService.save(successLogin.id, newRefreshToken)
             
-
-            //renvoie du token d'accès
-            res.cookie('accessToken', successLogin.newAccessToken) //FAIRE UNE MEILLEURE SECURITE AVEC LES OPTIONS
-            
-            //renvoie le token d'actualisation
-            res.cookie('refreshToken', successLogin.newRefreshToken) //FAIRE UNE MEILLEURE SECURITE AUSSI
-
-            return res.status(200).json({ message: `${email} authentifié` })
+            return res.status(200).json({ 
+                accessToken : successLogin.newAccessToken,
+                refreshToken : successLogin.newRefreshToken,
+                message: `${email} authentifié` 
+            })
 
         } catch (err) {            
             console.error("Erreur LDAP DANS LE USER CONTROLLER LOGIN : " + err);
@@ -63,9 +62,9 @@ const userController = {
 
         try {
             
-            res.clearCookie('accessToken');
-            res.clearCookie('refreshToken')
-            await refreshTokenService.revoke(req.cookies.refreshToken)
+            await refreshTokenService.revoke(sessionStorage.getItem(refreshToken))
+            sessionStorage.removeItem('accessToken');
+            sessionStorage.removeItem('refreshToken')
             return res.status(200).json({ message: 'Déconnexion réussie.' });
 
         } catch (err) {
@@ -75,36 +74,13 @@ const userController = {
 
     },
 
-    // refreshToken: async(req, res) => {
-
-    //      try {
-
-    //         const refreshToken = req.cookies.refreshToken;
-
-    //         if (!refreshToken) return res.status(401).json({ message: "Aucun token de rafraîchissement." });
-
-    //         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    //         const user = await userService.getUserById(decoded.id);
-
-    //         if (!user) return res.status(403).json({ message: "Utilisateur introuvable." });
-
-    //         const newAccessToken = authService.createAccessToken(user);
-            
-    //         res.cookie('accessToken', newAccessToken);
-    //         return res.status(200).json({ message: "Token actualisé." });
-
-    //     } catch (err) {
-    //         return res.status(403).json({ message: "Refresh token invalide ou expiré." });
-    //     }
-
-    // },
-
     getYourProfile: async(req, res) => {
 
         try {
             console.log("CONTROLLER");
             
-            const token = req.cookies.accessToken
+            const authHeader = req.headers['authorization']
+            const token = authHeader && authHeader.split(' ')[1]
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const email = decoded.email
 

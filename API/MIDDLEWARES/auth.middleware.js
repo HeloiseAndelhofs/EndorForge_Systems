@@ -4,9 +4,11 @@ const authService = require('../SERVICES/auth.service')
 const refreshTokenService = require('../SERVICES/refreshToken.service');
 
 const auth = async (req, res, next) => {
+        
+        const authHeader = req.headers['authorization']
+        const accessToken = authHeader && authHeader.split(' ')[1]
 
-    const accessToken = req.cookies.accessToken;
-    const refreshToken = req.cookies.refreshToken;
+        const refreshToken = req.headers['x-refresh-token']
 
     if (!accessToken) {
         return res.status(401).json({ message: "Aucun token détecté, veuillez vous reconnecter." });
@@ -58,8 +60,8 @@ const auth = async (req, res, next) => {
                 // Nouveau access token
                 const newAccessToken = authService.createAccessToken(userFromDB)
 
-                res.clearCookie('accessToken');
-                res.cookie("accessToken", newAccessToken);
+                //sessionStorage.removeItem('accessToken');
+                //sessionStorage.setItem("accessToken", newAccessToken);
 
                 req.payload = jwt.decode(newAccessToken);
                 return next();

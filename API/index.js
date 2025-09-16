@@ -1,5 +1,6 @@
 //Variables running server
 
+require('dotenv').config()
 const express = require('express')
 const router = require('./ROUTES/router')
 const http = require('http')
@@ -20,7 +21,7 @@ app.use(
         crossOriginEmbedderPolicy: false,
         contentSecurityPolicy: {
             directives: {
-                defaultSrc: ["'self'"],                // tout vient du domaine
+                defaultSrc: ["'self'", "http://localhost:8000"],                // tout vient du domaine
                 scriptSrc: ["'self'"],                 // juste mes propres JS
                 styleSrc: ["'self'"],                  // juste mes CSS
                 imgSrc: ["'self'", "data:"],           // images locales ou encodées
@@ -43,7 +44,7 @@ app.use(
 
 
 app.use(cors({
-    origin: 'http://localhost:5173', 
+    origin: 'http://nova.endorforge.local', 
     credentials: true
 }));
 

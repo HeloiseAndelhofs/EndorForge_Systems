@@ -15,12 +15,6 @@ const UploadFile = () => {
     const [ error, setError ] = useState("")
 
     const accessToken = sessionStorage.getItem('accessToken')
-    //const refreshToken = sessionStorage.getItem("refreshToken")
-
-    const headersSession = {
-      Authorization : `Bearer ${accessToken}`
-    }
-
     
     const handleSubmit = async (e) => {
         
@@ -44,14 +38,12 @@ const UploadFile = () => {
         try {
             
             const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, {
-                withCredentials: true,
-                headers: {"Content-Type" : "multipart/form-data"},
-                headersSession
+                headers: { 
+                    "Content-Type" : "multipart/form-data" ,
+                    Authorization : `Bearer ${accessToken}`
+                }
             })
 
-            if (res.status === 200) {
-                setMessage("Fichier uploadé avec succès !")
-            }
 
         } catch (err) {
             console.error(err);

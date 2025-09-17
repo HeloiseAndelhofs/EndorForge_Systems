@@ -38,9 +38,8 @@ const filesService = {
             
             await sql.connect(sqlConfig)
             const request = new sql.Request()
-            console.log(user.ou);
             
-            const teamId = await utilitFunc.getTeamIdByOU(user.ou)
+            const teamId = await utilitFunc.getTeamIdByName(user.team)
 
             const result = await request
                 .input("role", sql.VarChar, user.role)
@@ -54,7 +53,7 @@ const filesService = {
                                 OR (file_visibility = 'Private' AND FK_user_id = @userId)`)
  
             if (result.recordset.length <= 0) {
-                throw new Error("Erreur lors de la récupération des fichiers. (SERVICE)")
+                return 
             }
 
             return result.recordset

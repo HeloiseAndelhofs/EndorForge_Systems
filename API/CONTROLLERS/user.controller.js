@@ -26,7 +26,7 @@ const userController = {
             
 
             //Envoie les infos du req.body au service et attend sa réponse d'auth et pour trouver l'utilisateur
-            const successLogin = await userService.login(email, password, accessToken)
+            const successLogin = await userService.login(email, password)
             console.log("EST CE QU'ON ME VOIT 2 !!!!????");
             
 
@@ -34,10 +34,6 @@ const userController = {
             if (!successLogin) {
                 return res.status(404).json({ messsage : `La connexion a échouée, aucun utilisateur avec le mail ${email} trouvé. ` })
             }
-
-            console.log("ACCESS TOKEN CONTROLLER : " + successLogin.newAccessToken);
-            
-            //await refreshTokenService.save(successLogin.id, newRefreshToken)
             
             return res.status(200).json({ 
                 accessToken : successLogin.newAccessToken,

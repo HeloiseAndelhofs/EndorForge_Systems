@@ -29,7 +29,7 @@ const authService = {
         await sql.connect(sqlConfig)
         await new sql.Request()
                 .input("userID", sql.Int, user.user_id)
-                .input("token", sql.NVarChar, refreshToken)
+                .input("token", sql.NVarChar, accessToken)
                 .query(`UPDATE USERS 
                         SET user_refresh_token = @token, user_updatedAt = GETDATE()
                         WHERE user_id = @userID `)

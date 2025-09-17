@@ -133,6 +133,25 @@ const userController = {
             return res.status(500).json({ message : "Une erreur est survenue lors de la récupération des utilisateurs" })
         }
 
+    },
+
+    getTeams : async (req, res) => {
+        try {
+            
+            const teams = await userService.getTeams()
+
+            if (!teams) {
+                return res.status(404).json({ message : 'Aucune équipe trouvée' })
+            }
+
+            console.log(teams);
+            
+            return res.json(teams)
+
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message : "Une erreur est survenue lors de la récupération des équipes" })
+        }
     }
 
 }

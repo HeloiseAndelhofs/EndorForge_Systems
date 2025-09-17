@@ -6,6 +6,7 @@ import Home from "./PAGES/CONNECTED/home"
 import Profile from "./PAGES/CONNECTED/profile"
 import FilesList from "./PAGES/CONNECTED/files"
 import UploadFile from "./PAGES/CONNECTED/filesUpload"
+import Teams from "./PAGES/CONNECTED/teams"
 
 import Logout from "./COMPONENTS/Logout"
 
@@ -24,6 +25,7 @@ function App() {
       <Route path="/logout" element={<Logout />}/>
       <Route path="/files" element={<FilesList />} />
       <Route path="/files/upload" element={<UploadFile />} />
+      <Route path="/teams" element={<Teams/>} />
 
     </Routes>
 

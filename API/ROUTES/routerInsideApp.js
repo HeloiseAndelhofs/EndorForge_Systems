@@ -12,6 +12,8 @@ router.get('/yourProfile', auth, userController.getYourProfile)
 router.get('/searchUser', auth, userController.getUserByName)
 router.get('/logout', userController.logout)
 
+router.get('/teams', auth, userController.getTeams)
+
 //CHANGER LES ROUTES POUR QU'ELLES SOIENT PLUS DISTINCTES 
 // api/endor/user
 // api/endor/files

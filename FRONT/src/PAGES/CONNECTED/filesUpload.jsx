@@ -37,7 +37,7 @@ const UploadFile = () => {
 
         try {
             
-            const res = await axios.post("http://localhost:8000/api/endor/files/postFile", formData, {
+            const res = await axios.post("http://192.168.40.2:8000/api/endor/files/postFile", formData, {
                 headers: { 
                     "Content-Type" : "multipart/form-data" ,
                     Authorization : `Bearer ${accessToken}`

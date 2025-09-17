@@ -5,11 +5,16 @@ import axios from "axios"
 const Logout = () => {
   const navigate = useNavigate()
 
+    const headers = {
+      Authorization : `Bearer ${accessToken}`
+    }
+
   useEffect(() => {
     const logoutFunc = async () => {
       try {
-        const result = await axios.get("http://localhost:8000/api/endor/logout", {
-          withCredentials: true, // important si tu utilises des cookies
+        const result = await axios.get("http://192.168.40.2:8000/api/endor/logout", {
+          headers,
+          withCredentials: true
         })
 
         if (result.status !== 200) {

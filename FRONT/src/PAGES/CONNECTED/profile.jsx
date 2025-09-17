@@ -17,7 +17,7 @@ const Profile = () => {
   useEffect(() => {
     const dataProfil = async () => {
       try {
-        const result = await axios.get("http://localhost:8000/api/endor/yourProfile", {
+        const result = await axios.get("http://192.168.40.2:8000/api/endor/yourProfile", {
           withCredentials: true,
           headers
         })

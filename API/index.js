@@ -64,7 +64,7 @@ app.use('/api', router)
 
 
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Connection faite sur le port ${ PORT }`);
     
 })

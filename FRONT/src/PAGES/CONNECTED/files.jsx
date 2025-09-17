@@ -17,7 +17,7 @@ const FilesList = () => {
     useEffect(() => {
         const fetchList = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/endor/files", {
+                const res = await axios.get("http://192.168.40.2:8000/api/endor/files", {
                     headers,
                     withCredentials: true
                 })
@@ -36,7 +36,7 @@ const FilesList = () => {
 
       try {
         
-        const resDownload = await axios.get(`http://localhost:8000/api/endor/files/download/${fileId}`, {
+        const resDownload = await axios.get(`http://192.168.40.2:8000/api/endor/files/download/${fileId}`, {
           headers,
           responseType: 'blob'
         })

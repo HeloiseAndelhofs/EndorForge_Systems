@@ -8,7 +8,15 @@ const filesService = {
         try {
             
             await sql.connect(sqlConfig);
+
             const request = new sql.Request();
+
+            const existing = await request.input('filename', sql.VarChar, filename).query(`SELECT * FROM FILES WHERE file_name = @filename `)
+
+            if (existing.recordset.length > 0) {
+                return { success : false, reason : "DUPLICATE" }
+            }
+
             await request
                 .input('filename', sql.VarChar, filename)
                 .input('file_path', sql.VarChar, file_path)
@@ -24,7 +32,7 @@ const filesService = {
                     VALUES (@filename, @file_path, @userId, GETDATE(), @visibility, @roleRequired, @file_type, @file_size, @teamId, @description)
                 `)
 
-            return
+            return { success : true }
 
         } catch (err) {
             console.error("Erreur serveur lors de l'ajout du fichier dans la DB : " + err);

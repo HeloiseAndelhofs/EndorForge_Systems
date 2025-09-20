@@ -130,17 +130,21 @@ const filesController = {
       const validatedInput = await accessService.validateFileAccessOptions(decoded, visibility, roleRequired, teamName)
 
       // Enregistre en base de données
-      await filesService.putFileDB(
-        file.name,
-        relativePath,
-        decoded.id,
-        validatedInput.visibility,
-        validatedInput.roleRequired,
-        file.mimetype,
-        file.size,
-        validatedInput.teamId,
-        description
-      );
+      const result = await filesService.putFileDB(
+          file.name,
+          relativePath,
+          decoded.id,
+          validatedInput.visibility,
+          validatedInput.roleRequired,
+          file.mimetype,
+          file.size,
+          validatedInput.teamId,
+          description
+        );
+
+      if (!result.success && result.reason === "DUPLICATE") {
+        return res.status(409).json({ message : "Ce fichier existe déja." })
+      }
 
       return res.send("Fichier uploadé avec succès.");
 

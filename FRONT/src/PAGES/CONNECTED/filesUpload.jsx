@@ -44,8 +44,20 @@ const UploadFile = () => {
                 }
             })
 
+            if (res) {
+                setMessage("Fichier uploadé avec succès")
+                setFile(null)
+                setDescription("")
+                setVisibility("")
+                setRoleRequired("")
+                setTeamName("")
+            }
+
 
         } catch (err) {
+            if (err.response && err.response.status === 409) {
+                setError("Ce fichier existe déja.")
+            }
             console.error(err);
             setError(err.message)
         }
@@ -61,6 +73,7 @@ const UploadFile = () => {
 
                 <h1> Uploader un fichier </h1>
                 {error && <p className="error"> {error} </p>}
+                {message && <p className="message"> {message} </p>}
 
                 <form onSubmit={handleSubmit}>
 

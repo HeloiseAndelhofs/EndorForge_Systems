@@ -13,7 +13,7 @@ const initClamscan = async () => {
           scan_recursively: false,
           clamdscan: {
             socket: false,
-            host: '127.0.0.1',
+            host: 'localhost',
             port: 3310,
             timeout: 60000,
             local_fallback: false,

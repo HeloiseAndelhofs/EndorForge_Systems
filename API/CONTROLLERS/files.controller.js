@@ -7,6 +7,7 @@ const initClamscan = require('../configs/clamscan.config')
 const filesService = require('../SERVICES/files.service');
 const accessService = require("../SERVICES/access.service");
 const utilityFunctions = require('../SERVICES/utilityFuncUsers.service');
+const { error } = require('console');
 //const clamscan = require('../configs/clamscan.config');
 
 let tmpPath = null;
@@ -170,12 +171,12 @@ const filesController = {
       const authHeader = req.headers['authorization']
       const token = authHeader && authHeader.split(' ')[1]
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const filesList = await filesService.getFiles(decoded)
-      const userTeam = await utilityFunctions.getTeamIdByName(decoded.team)
+      const teamId = decoded.team_id
+      const filesList = await filesService.getFiles(decoded, teamId)
 
       if (filesList.length > 0) {      
         const accessibleFiles = filesList.filter(file => 
-          accessService.canAccessFile(decoded, file, userTeam)
+          accessService.canAccessFile(decoded, file, teamId)
         )
   
         if (accessibleFiles) {
@@ -232,6 +233,22 @@ const filesController = {
     } catch (err) {
       console.error("Erreur serveur lors du téléchargement des fichiers : " + err);
       return res.status(500).json({ message: "Erreur lors de la récupération des fichiers" });
+    }
+  },
+  getLatestFiles : async (req, res) => {
+    try {
+      
+      const result = await filesService.getLatestFiles(3)
+
+      if (!result || result.length <= 0) {
+        return res.status(404).json({ message : "Aucun fichier trouvé." })
+      }
+
+      return res.json(result)
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message : "Erreur lors de la récupération des fichiers récents" })
     }
   }
 };

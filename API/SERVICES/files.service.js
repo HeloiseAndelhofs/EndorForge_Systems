@@ -8,17 +8,18 @@ const filesService = {
         try {
             
             await sql.connect(sqlConfig);
-
             const request = new sql.Request();
 
-            const existing = await request.input('filename', sql.VarChar, filename).query(`SELECT * FROM FILES WHERE file_name = @filename `)
+            const existing = await request
+            .input('filename', sql.VarChar, filename)
+            .query(`SELECT * FROM FILES WHERE file_name = @filename`,)
 
             if (existing.recordset.length > 0) {
-                return { success : false, reason : "DUPLICATE" }
+            return { success: false, reason: "DUPLICATE" };
             }
 
             await request
-                .input('filename', sql.VarChar, filename)
+
                 .input('file_path', sql.VarChar, file_path)
                 .input('userId', sql.Int, userID)
                 .input('visibility', sql.VarChar, visibility)
@@ -40,20 +41,19 @@ const filesService = {
         }
     },
 
-    getFiles: async (user) => {
+    getFiles: async (user, userTeam) => {
 
         try {
             
             await sql.connect(sqlConfig)
             const request = new sql.Request()
-            
-            const teamId = await utilitFunc.getTeamIdByName(user.team)
+        
 
             const result = await request
                 .input("role", sql.VarChar, user.role)
-                .input('teamId', sql.Int, teamId)
+                .input('teamId', sql.Int, userTeam)
                 .input('userId', sql.Int, user.id)
-                    .query(`SELECT * FROM files 
+                .query(`SELECT * FROM files 
                             WHERE
                                 (@role = 'Admin')
                                 OR (file_visibility = 'Public') 
@@ -95,6 +95,27 @@ const filesService = {
             throw new Error(err.message)
         }
 
+    },
+        getLatestFiles : async (limit) => {
+        try {
+            await sql.connect(sqlConfig)
+
+            const request = new sql.Request()
+
+            const result = await request
+                .input("limit", sql.Int, limit)
+                .query(`
+                    SELECT TOP (@limit) * 
+                    FROM FILES
+                    ORDER BY file_uploadedAt DESC
+                    `)
+                    
+            return result.recordset
+
+        } catch (err) {
+            console.error("Erreur récupération des derniers fichiers : " + err);
+            throw new Error("Impossible de récupérer les derniers fichiers")
+        }
     }
 
 }

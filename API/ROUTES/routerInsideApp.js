@@ -21,6 +21,7 @@ router.get('/teams', auth, userController.getTeams)
 router.post('/files/postFile', auth, filesController.uploadFile)
 router.get('/files', auth, filesController.getFiles)
 router.get('/files/download/:id', auth, filesController.downloadFiles)
+router.get('/files/latest', auth, filesController.getLatestFiles)
 
 
 

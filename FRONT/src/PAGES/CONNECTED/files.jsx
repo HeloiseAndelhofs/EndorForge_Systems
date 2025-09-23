@@ -48,6 +48,7 @@ const FilesList = () => {
         document.body.appendChild(link);
         link.click();
         link.remove();
+        
 
       } catch (err) {
         console.error("Erreur lors du téléchargement : ", err);

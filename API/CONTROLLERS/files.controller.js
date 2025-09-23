@@ -97,7 +97,7 @@ const filesController = {
 
       //Prépare les chemins fichiers
       const finalFileName = `${uploaderName}_${baseName}${extension}`;
-      const finalPath = path.join(__dirname, '../FILES/filesUploaded', finalFileName);
+      const finalPath = path.join("c:/filesUploaded", finalFileName);
       const relativePath = `filesUploaded/${finalFileName}`;
       
       // Dans dossier temopraire pour analyse antivirus
@@ -176,20 +176,11 @@ const filesController = {
       
 
       if (filesList.length > 0) {      
-        const accessibleFiles = filesList.filter(file => 
-          accessService.canAccessFile(decoded, file, teamId)
-        )
-  
-        if (accessibleFiles) {
-          return res.status(200).json(accessibleFiles)
-  
-        } else {
-  
-          return res.status(404).json({message : "Une erreur est survenue lors de la récupération des fichiers, rien n'a été récupéré. (CONTROLLER)"})
-        }
+      console.log(`filesList dans get files ! : ${filesList}`);
+        return res.json(filesList)
       }
 
-      return res.status(300).json({ message: "Aucun fichier disponible" })
+      return res.status(404).json({ message: "Aucun fichier disponible" })
 
 
     } catch (err) {

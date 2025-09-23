@@ -61,16 +61,24 @@ const filesService = {
                         f.file_visibility,
                         f.file_roleRequired,
                         f.file_size,
+                        f.FK_team_id,
                         u.user_login_name AS uploader_name
                     FROM FILES f
                     INNER JOIN USERS u ON f.FK_user_id = u.user_id
                     ORDER BY f.file_uploadedAt DESC `)
  
-            if (result.recordset.length <= 0) {
-                return 
-            }
+            const files = result.recordset        
+            const accessibleFiles = []
 
-            return result.recordset
+            for (const file of files) {
+                const canAcess = await accessService.canAccessFile(user, file, userTeam )
+                if (canAcess) {
+                accessibleFiles.push(file)
+                }
+           }
+           console.log("accessibleFiles : " + accessibleFiles);
+
+            return accessibleFiles
 
         } catch (err) {
             console.error(err);
@@ -116,7 +124,7 @@ const filesService = {
                     ORDER BY file_uploadedAt DESC
                     `)
                     
-            const files =  result.recordset
+            const files = result.recordset
 
             const accessibleFiles = []
 

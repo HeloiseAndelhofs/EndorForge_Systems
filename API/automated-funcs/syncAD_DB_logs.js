@@ -2,7 +2,7 @@ const fs = require('fs')
 
 
 const today = new Date().toISOString().split('T')[0];
-const logFile = `/home/hlo/Documents/code/EndorForge_utils/logs_Sync_AD_DB/sync-${today}.txt`
+const logFile = `c:/logs_syncAD_DB/sync-${today}.txt`
 
 const logsSync = {
 

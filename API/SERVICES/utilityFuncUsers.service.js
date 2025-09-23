@@ -36,28 +36,37 @@ const utilityFunctions = {
     },
 
     getTeamIdByOU: async (ou) => {
-        try {
-            console.log(ou);
-            
-            await sql.connect(sqlConfig)
-
-            const teamID = await new sql.Request()
-                    .input('ou', sql.VarChar(100), ou)
-                    .query(`SELECT team_id FROM TEAMS
-                        WHERE team_ou = @ou`)
-
-            if (!teamID.recordset.length) {
-                console.error("Aucune team trouvée avec cet ou");
-                throw new Error('Pas de team avec cet ou')
-            }
-
-            return teamID.recordset[0].team_id
-
-        } catch (err) {
-            console.error(err);
-            throw new Error("Erreur serveur pendant la récupération de la team")
+    try {
+        if (!ou) {
+        console.error("OU fourni est null ou vide");
+        return null; 
         }
+
+        console.log("Recherche team pour OU =", ou);
+
+        await sql.connect(sqlConfig);
+
+        const result = await new sql.Request()
+        .input('ou', sql.VarChar(100), ou.trim()) 
+        .query(`
+            SELECT team_id, team_name, team_ou 
+            FROM TEAMS
+            WHERE team_ou = @ou
+        `);
+
+        if (!result.recordset.length) {
+        console.warn(`Aucune team trouvée avec l'OU "${ou}"`);
+        return null; 
+        }
+
+        return result.recordset[0].team_id;
+
+    } catch (err) {
+        console.error("Erreur SQL dans getTeamIdByOU:", err);
+        throw err; // on garde l'erreur réelle pour debug
+    }
     },
+
 
     getTeamIdByName: async (teamName) => {
 

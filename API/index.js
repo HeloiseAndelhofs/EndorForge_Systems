@@ -60,7 +60,7 @@ app.use(express.json())
 app.use('/api', router)
 
 
-//require('./automated-funcs/cron.schedule')
+require('./automated-funcs/cron.schedule')
 
 
 

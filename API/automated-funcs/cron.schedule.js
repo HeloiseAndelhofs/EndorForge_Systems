@@ -3,7 +3,7 @@ const ad_db_func = require('./checkSync_AD_DB');
 const logsAD_DB = require('./syncAD_DB_logs')
 
 
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('0 13 * * *', async () => {
   try {
 
     console.log('[CRON] Lancement de la synchronisation AD ↔ DB');

@@ -4,7 +4,7 @@ const utilityFunc = require('../SERVICES/utilityFuncUsers.service')
 const accessService = {
 
     canAccessFile: async (user, file, userTeam) => {
-
+        
         const userRole = user.role
         const requiredRole = file.file_roleRequired
         const isAdmin = userRole === "Admin"

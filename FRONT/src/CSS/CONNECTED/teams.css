@@ -15,36 +15,37 @@
 /* Grille d'équipes */
 .teams-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); /* largeur minimale augmentée */
+  gap: 2rem; /* espace un peu plus grand entre les cartes */
 }
 
 /* Carte d'équipe */
 .team-card {
   background: #1e293b;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2rem; /* plus d'air à l’intérieur */
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s;
-}
-
-.team-card:hover {
-  transform: translateY(-4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .team-card h2 {
   color: #38bdf8;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.4rem; /* un peu plus d’espace sous le titre */
 }
 
 .team-ou {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #94a3b8;
+  margin-bottom: 0.6rem;
 }
 
 .team-desc {
-  margin: 0.5rem 0 1rem;
+  margin: 0.8rem 0 1.2rem;
   color: #cbd5e1;
+  line-height: 1.4;
 }
 
 /* Liste des membres */
@@ -55,12 +56,20 @@
 }
 
 .members-list li {
-  padding: 0.3rem 0;
+  padding: 0.5rem 0; /* plus de vertical */
   border-bottom: 1px solid #334155;
   color: #f1f5f9;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-break: break-word; /* coupe proprement les emails longs */
+}
+
+.members-list li:last-child {
+  border-bottom: none; /* évite une barre inutile en bas */
 }
 
 .no-members {
   color: #94a3b8;
   font-style: italic;
+  margin-top: 0.5rem;
 }

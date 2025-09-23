@@ -1,6 +1,6 @@
 const sqlConfig = require('../configs/sql.config')
 const sql = require('mssql')
-const utilitFunc = require('../SERVICES/utilityFuncUsers.service')
+const accessService = require('./access.service')
 
 const filesService = {
 
@@ -53,12 +53,18 @@ const filesService = {
                 .input("role", sql.VarChar, user.role)
                 .input('teamId', sql.Int, userTeam)
                 .input('userId', sql.Int, user.id)
-                .query(`SELECT * FROM files 
-                            WHERE
-                                (@role = 'Admin')
-                                OR (file_visibility = 'Public') 
-                                OR (file_visibility = 'Team' AND FK_team_id = @teamId)
-                                OR (file_visibility = 'Private' AND FK_user_id = @userId)`)
+                .query(`
+                    SELECT 
+                        f.file_id,
+                        f.file_name,
+                        f.file_description,
+                        f.file_visibility,
+                        f.file_roleRequired,
+                        f.file_size,
+                        u.user_login_name AS uploader_name
+                    FROM FILES f
+                    INNER JOIN USERS u ON f.FK_user_id = u.user_id
+                    ORDER BY f.file_uploadedAt DESC `)
  
             if (result.recordset.length <= 0) {
                 return 
@@ -96,21 +102,36 @@ const filesService = {
         }
 
     },
-        getLatestFiles : async (limit) => {
+        getLatestFiles : async (user, limit, teamId) => {
         try {
             await sql.connect(sqlConfig)
 
             const request = new sql.Request()
 
             const result = await request
-                .input("limit", sql.Int, limit)
+                .input("limit", sql.Int, limit * 5)
                 .query(`
                     SELECT TOP (@limit) * 
                     FROM FILES
                     ORDER BY file_uploadedAt DESC
                     `)
                     
-            return result.recordset
+            const files =  result.recordset
+
+            const accessibleFiles = []
+
+           for (const file of files) {
+            const canAcess = await accessService.canAccessFile(user, file, teamId )
+            if (canAcess) {
+                accessibleFiles.push(file)
+            }
+            if (accessibleFiles.length >= limit) {
+                break
+            }
+           }
+           console.log("accessibleFiles : " + accessibleFiles);
+           
+            return accessibleFiles
 
         } catch (err) {
             console.error("Erreur récupération des derniers fichiers : " + err);

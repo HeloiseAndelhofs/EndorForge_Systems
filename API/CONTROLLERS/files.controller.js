@@ -171,8 +171,9 @@ const filesController = {
       const authHeader = req.headers['authorization']
       const token = authHeader && authHeader.split(' ')[1]
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const teamId = decoded.team_id
+      const teamId = await utilityFunctions.getTeamIdByName(decoded.ou)
       const filesList = await filesService.getFiles(decoded, teamId)
+      
 
       if (filesList.length > 0) {      
         const accessibleFiles = filesList.filter(file => 
@@ -235,15 +236,21 @@ const filesController = {
       return res.status(500).json({ message: "Erreur lors de la récupération des fichiers" });
     }
   },
+
   getLatestFiles : async (req, res) => {
     try {
       
-      const result = await filesService.getLatestFiles(3)
+      const authHeader = req.headers['authorization']
+      const token = authHeader && authHeader.split(' ')[1]
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const teamId = await utilityFunctions.getTeamIdByName(decoded.ou)
+      const result = await filesService.getLatestFiles(decoded, 3, teamId)
 
       if (!result || result.length <= 0) {
         return res.status(404).json({ message : "Aucun fichier trouvé." })
       }
-
+      console.log(result);
+      
       return res.json(result)
 
     } catch (err) {

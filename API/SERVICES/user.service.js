@@ -161,27 +161,6 @@ const userService = {
 
         },
 
-        // getTeams : async () => {
-
-        //     try {
-                
-        //         await sql.connect(sqlConfig)
-
-        //         const req = await new sql.Request()
-        //         const result = await req
-        //             .query(`SELECT * FROM TEAMS`)
-
-        //         if (result.recordset.length <= 0) {
-        //             throw new Error(" Aucune team trouvée ")
-        //         }
-
-        //         return result
-
-        //     } catch (err) {
-        //         console.error(err + " : Erreur récupération des teams");
-        //         throw new Error(err.message)
-        //     }
-        // }
         getTeams: async () => {
 
             try {

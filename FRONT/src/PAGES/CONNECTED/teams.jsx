@@ -51,7 +51,7 @@ const Teams = () => {
               {team.members.length > 0 ? (
                 <ul className="members-list">
                   {team.members.map((member) => (
-                    <li key={member.user_id}>{member.username}</li>
+                    <li key={member.user_id}>{member.username} : {member.email}</li>
                   ))}
                 </ul>
               ) : (

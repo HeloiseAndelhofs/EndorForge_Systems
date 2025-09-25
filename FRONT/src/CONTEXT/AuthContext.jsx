@@ -1,38 +1,55 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-// Création du contexte
-const AuthContext = createContext({ role: null, loading: true });
+const AuthContext = createContext({ user: null, role: null, loading: true });
 
-// Provider minimaliste
 export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("accessToken");
-    console.log(token);
-    
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log(decoded);
-        
-        setRole(decoded.role); // On ne garde que le rôle
-      } catch (err) {
-        console.error("JWT invalide:", err);
-        sessionStorage.removeItem("accessToken");
-      }
+  const token = sessionStorage.getItem("accessToken");
+  const checkToken = () => {
+    if (!token) {
+      setUser(null);
+      setRole(null);
+      navigate("/login");
+      return;
     }
+
+    try {
+      const decoded = jwtDecode(token);
+      const now = Date.now() / 1000;
+      if (decoded.exp && decoded.exp < now) {
+        sessionStorage.removeItem("accessToken");
+        setUser(null);
+        setRole(null);
+        navigate("/login");
+      } else {
+        setUser(decoded);
+        setRole(decoded.role || null);
+      }
+    } catch (err) {
+      sessionStorage.removeItem("accessToken");
+      setUser(null);
+      setRole(null);
+      navigate("/login");
+    }
+  };
+
+  // Vérifie à chaque montage
+  useEffect(() => {
+    checkToken();
     setLoading(false);
-  }, []);
+  }, [token]);
 
   return (
-    <AuthContext.Provider value={{ role }}>
+    <AuthContext.Provider value={{ user, role, loading, checkToken }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook pour accéder facilement au rôle
 export const useAuth = () => useContext(AuthContext);

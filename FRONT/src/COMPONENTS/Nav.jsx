@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../CONTEXT/AuthContext"
 import "../CSS/COMPONENTS/Nav.css"
+import { useEffect } from "react"
 
 
 const Nav = () => {
@@ -8,7 +9,6 @@ const Nav = () => {
     const { role, loading } = useAuth();
 
     if (loading) return null;
-    
     
 
     return (

@@ -45,11 +45,25 @@ const adminService = {
     },
 
     getLogs: async() => {
+        try {
+            
+            const logs = await logsAD_DB.readLastLogs(200);
+            return logs;
 
+        } catch (err) {
+            console.error(err);
+        }
     },
 
     triggerSync: async() => {
-        
+
+        try {
+            const result = await ad_db_func.syncCheck();
+            logsAD_DB.appendLogsToFile(result);
+            return { message: "Synchronisation lancée", result };
+        } catch (err) {
+            console.error(err);
+        }
     }
 
 }

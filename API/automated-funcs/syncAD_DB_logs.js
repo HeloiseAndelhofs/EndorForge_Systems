@@ -16,7 +16,30 @@ const logsSync = {
     
         fs.appendFileSync(logFile, logContent)
     
+    },
+
+     // Récupère les X dernières lignes
+    readLastLogs: (limit = 100) => {
+
+        try {
+
+        if (!fs.existsSync(logFile)) {
+            return [];
+        }
+
+        const content = fs.readFileSync(logFile, "utf8");
+        const lines = content.trim().split("\n");
+
+        return lines.slice(-limit);
+
+        } catch (err) {
+        console.error("[LOGS] Erreur lecture du fichier de logs :", err);
+        return [];
+
+        }
+
     }
+
 }
 
 module.exports = logsSync

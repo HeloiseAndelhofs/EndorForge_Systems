@@ -7,7 +7,7 @@ const accessService = {
         
         const userRole = user.role
         const requiredRole = file.file_roleRequired
-        const isAdmin = userRole === "Admin"
+        const isAdmin = userRole === "admin"
 
         // Cas où un rôle est requis : priorité
         if (requiredRole) {
@@ -25,7 +25,7 @@ const accessService = {
             return file.FK_team_id === userTeam || isAdmin
 
         case "Private":
-            return user.id === file.FK_user_id || user.role === "Admin"
+            return user.id === file.FK_user_id || user.role === "admin"
 
         default:
             return false;
@@ -35,7 +35,7 @@ const accessService = {
     validateFileAccessOptions: async (user, visibility, roleRequired, teamName) => {
 
         const allowedVisibility = ["Public", "Team", "Private"];
-        const allowedRoles = ["Admin", "RABADON", "TRINITE", "MERCURE", "COOKIES", "PINKWARD"];
+        const allowedRoles = ["admin", "RABADON", "TRINITE", "MERCURE", "COOKIES", "PINKWARD"];
 
         let teamId;
 
@@ -60,7 +60,7 @@ const accessService = {
         }
 
         // Vérif droits de l’utilisateur
-        if (roleRequired === "Admin" && user.role !== "Admin") {
+        if (roleRequired === "admin" && user.role !== "admin") {
         throw new Error("Vous n'avez pas les droits pour restreindre aux admins.");
         }
 

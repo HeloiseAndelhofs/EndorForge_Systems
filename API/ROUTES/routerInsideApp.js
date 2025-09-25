@@ -27,13 +27,13 @@ router.get('/files/latest', auth, filesController.getLatestFiles)
 //routes Admin
 
 //users
-router.get("/admin/users", authorize('Admin'), auth, adminController.getAllUsers )
+router.get("/admin/users", authorize('admin'), auth, adminController.getAllUsers )
 
 //teams
-router.get('/admin/teams', authorize('Admin'), auth, adminController.getAllTeams)
+router.get('/admin/teams', authorize('admin'), auth, adminController.getAllTeams)
 
 //ad_db
-router.get('/admin/logs', authorize('Admin'), auth, adminController.getLogs)
-router.post('/admin/sync', authorize('Admin'), auth, adminController.triggerSync)
+router.get('/admin/logs', authorize('admin'), auth, adminController.getLogs)
+router.post('/admin/sync', authorize('admin'), auth, adminController.triggerSync)
 
 module.exports = router

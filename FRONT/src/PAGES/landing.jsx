@@ -12,7 +12,6 @@ const Landing = () => {
 
   return (
     <>
-      <Nav />
       <main>
         <h1>Nova par Endor Forge Systems</h1>
         <h2>

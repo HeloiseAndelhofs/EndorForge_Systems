@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../CONTEXT/AuthContext"
+import { Navigate } from "react-router-dom"
+import "../../CSS/CONNECTED/adminDashboard.css"
+import Nav from "../../COMPONENTS/Nav"
+
 
 const AdminDashboard = () => {
   const [tab, setTab] = useState("users");
@@ -7,17 +12,45 @@ const AdminDashboard = () => {
   const [teams, setTeams] = useState([]);
   const [logs, setLogs] = useState([]);
 
+  const { role } = useAuth()
+
+  if (!role) return <Navigate to="/login" />
+  if (role !== "admin") return <Navigate to="/profile" />
+
+  const accessToken = sessionStorage.getItem('accessToken')
+
+  const headers = {
+      Authorization : `Bearer ${accessToken}`
+    }
+
   useEffect(() => {
+
+    if (!role) return
+
     if (tab === "users") {
-      axios.get("/api/admin/users").then((res) => setUsers(res.data));
+      axios.get("http://192.168.40.2:8000/api/endor/admin/users", {
+                    headers,
+                    withCredentials: true
+                }).then((res) => setUsers(res.data));
     } else if (tab === "teams") {
-      axios.get("/api/admin/teams").then((res) => setTeams(res.data));
+      axios.get("http://192.168.40.2:8000/api/endor/admin/teams", {
+                    headers,
+                    withCredentials: true
+                }).then((res) => setTeams(res.data));
     } else if (tab === "logs") {
-      axios.get("/api/admin/logs").then((res) => setLogs(res.data));
+      axios.get("http://192.168.40.2:8000/api/endor/admin/logs", {
+                    headers,
+                    withCredentials: true
+                }).then((res) => setLogs(res.data));
     }
   }, [tab]);
 
+
   return (
+
+    <>
+    <Nav />
+
     <div className="admin-dashboard">
       <h1>Admin Dashboard</h1>
       <div className="tabs">
@@ -61,6 +94,8 @@ const AdminDashboard = () => {
         <pre>{logs.join("\n")}</pre>
       )}
     </div>
+    </>
+
   );
 };
 

@@ -77,6 +77,8 @@ const ad_db_func = {
         if (groups.includes('MERCURE')) return 'MERCURE';
         if (groups.includes('COOKIES')) return 'COOKIES';
         if (groups.includes('PINKWARD')) return 'PINKWARD';
+        if (groups.includes('gg_admin')) return 'admin';
+
         return null;
       }
 

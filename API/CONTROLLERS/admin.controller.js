@@ -43,7 +43,7 @@ const admin = {
     getLogs: async (req, res) => {
 
         try {
-
+            
             const logs = await adminService.getLogs();
             res.json(logs);
 

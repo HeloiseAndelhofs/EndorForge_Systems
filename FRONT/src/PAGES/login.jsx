@@ -45,7 +45,6 @@ const Login = () => {
     return (
 
         <>
-            <Nav />
 
             <div className="login-container">
                 <div className="login-form">

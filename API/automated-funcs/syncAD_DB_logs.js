@@ -1,3 +1,4 @@
+const { log } = require('console');
 const fs = require('fs')
 
 
@@ -19,7 +20,7 @@ const logsSync = {
     },
 
      // Récupère les X dernières lignes
-    readLastLogs: (limit = 100) => {
+    readLastLogs: async (limit) => {
 
         try {
 
@@ -28,6 +29,7 @@ const logsSync = {
         }
 
         const content = fs.readFileSync(logFile, "utf8");
+        
         const lines = content.trim().split("\n");
 
         return lines.slice(-limit);

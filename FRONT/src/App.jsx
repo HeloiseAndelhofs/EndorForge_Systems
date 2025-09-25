@@ -7,6 +7,7 @@ import Profile from "./PAGES/CONNECTED/profile"
 import FilesList from "./PAGES/CONNECTED/files"
 import UploadFile from "./PAGES/CONNECTED/filesUpload"
 import Teams from "./PAGES/CONNECTED/teams"
+import AdminDashboard from "./PAGES/CONNECTED/AdminDashboard"
 
 import Logout from "./COMPONENTS/Logout"
 
@@ -25,7 +26,8 @@ function App() {
       <Route path="/logout" element={<Logout />}/>
       <Route path="/files" element={<FilesList />} />
       <Route path="/files/upload" element={<UploadFile />} />
-      <Route path="/teams" element={<Teams/>} />
+      <Route path="/teams" element={<Teams />} />
+      <Route path="/admin" element={<AdminDashboard />} />
 
     </Routes>
 

@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [teams, setTeams] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [ syncMessage, setSyncMessage ] = useState("")
 
   const { role } = useAuth()
 
@@ -42,6 +43,11 @@ const AdminDashboard = () => {
                     headers,
                     withCredentials: true
                 }).then((res) => setLogs(res.data));
+    } else if (tab === "sync") {
+      axios.post("http://192.168.40.2:8000/api/endor/admin/sync", {}, {
+        headers,
+        withCredentials : true
+      }).then((res) => setSyncMessage(res.data.message))
     }
   }, [tab]);
 
@@ -57,6 +63,7 @@ const AdminDashboard = () => {
         <button onClick={() => setTab("users")}>Users</button>
         <button onClick={() => setTab("teams")}>Teams</button>
         <button onClick={() => setTab("logs")}>Logs</button>
+        <button onClick={() => setTab("sync")}>Synchronisation</button>
       </div>
 
       {tab === "users" && (
@@ -93,6 +100,10 @@ const AdminDashboard = () => {
       {tab === "logs" && (
         <pre>{logs.join("\n")}</pre>
       )}
+
+      {tab === "sync" && 
+        <p className="sync_p">{syncMessage}</p>
+      }
     </div>
     </>
 

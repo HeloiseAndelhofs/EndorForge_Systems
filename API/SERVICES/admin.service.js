@@ -60,7 +60,7 @@ const adminService = {
         try {
             const result = await ad_db_func.syncCheck();
             logsAD_DB.appendLogsToFile(result);
-            return { message: "Synchronisation lancée", result };
+            return { message: "Synchronisation réussie", result };
         } catch (err) {
             console.error(err);
         }
